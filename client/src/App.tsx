@@ -1,13 +1,7 @@
-import "./App.css";
-import FridgeList from "./component/FridgeList";
+import AppContainer from "./component/container/AppContainer";
 
 function App() {
-  return (
-    <div>
-      <h1>SmartKitchen</h1>
-      <FridgeList />
-    </div>
-  );
+  return <AppContainer />;
 }
 
 export default App;
