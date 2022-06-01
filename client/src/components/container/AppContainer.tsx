@@ -1,6 +1,6 @@
 import { Grid } from "@mui/material";
 import MainContainer from "./MainContainer";
-import TopNav from "./TopNav";
+import TopNav from "./TopNavContainer";
 
 function AppContainer() {
   return (
