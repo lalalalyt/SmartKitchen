@@ -2,6 +2,7 @@ import { AppBar, Toolbar, Typography } from "@mui/material";
 import Authentication from "../topNav/Authentication";
 
 function TopNav() {
+  
   return (
     <AppBar position="static">
       <Toolbar>
