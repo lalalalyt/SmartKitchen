@@ -1,4 +1,4 @@
-const { Client } = require("pg");
+import { Client } from "pg";
 
 const URL =
   "postgres://bviktfvi:4AZ_zlgmVXulMi0VWt6F1qs4Sy_4rgDF@fanny.db.elephantsql.com/bviktfvi";
@@ -27,4 +27,6 @@ client
 
 client.query(`
 
-`)
+`);
+
+export { client };
