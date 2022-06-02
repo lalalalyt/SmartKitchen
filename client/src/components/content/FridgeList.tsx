@@ -18,7 +18,7 @@ function FridgeList(props: FridgeListProps) {
       type={fridge.type as "R" | "F"}
     />
   ));
-  
+
   useEffect(() => {
     axios.get("/fridge").then((res) => {
       setFridgeList(res.data);
