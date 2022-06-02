@@ -1,8 +1,7 @@
+import { useContext } from "react";
 import { Grid } from "@mui/material";
 import FridgeList from "../content/FridgeList";
 import ItemList from "../content/ItemList";
-// import useVisualMode from "../../hooks/useVisualMode";
-import { useContext } from "react";
 import { ModeContext } from "../../App";
 
 function MainContainer() {
@@ -11,7 +10,7 @@ function MainContainer() {
     <Grid>
       {mode === "HOME" && (
         <FridgeList
-          onClick={() => { 
+          onClick={() => {
             transite("LIST");
           }}
         />
