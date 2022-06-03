@@ -12,6 +12,8 @@ function App() {
     setMode(newMode);
   };
 
+  
+
   return (
     <ModeContext.Provider value={[mode, transite]}>
       <AppContainer />
