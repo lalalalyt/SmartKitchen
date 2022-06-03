@@ -1,4 +1,4 @@
-import { List } from "@mui/material";
+import { List, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import Fridge, { FridgeProps } from "./Fridge";
 import axios from "axios";
@@ -9,13 +9,14 @@ interface FridgeListProps {
 }
 
 function FridgeList(props: FridgeListProps) {
-  const [, setFridgeID] = useContext(FridgeContext);
+  const { setFridgeType, setFridgeID } = useContext(FridgeContext);
   const [fridgeList, setFridgeList] = useState<[FridgeProps] | null>(null);
   const list = fridgeList?.map((fridge) => (
     <Fridge
       onClick={() => {
         props.onClick();
         setFridgeID(fridge.id);
+        setFridgeType(fridge.type);
       }}
       key={fridge.id}
       id={fridge.id}

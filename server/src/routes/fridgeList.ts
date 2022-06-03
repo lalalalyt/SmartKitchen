@@ -12,7 +12,13 @@ fridgeRouter.get("/", (req, res) => {
 
 fridgeRouter.get("/:id", (req, res) => {
   const text =
-    'select * from "list" join "item" on item_id=item.id where fridge_id= $1';
+    `select list.id, list.quantity, list.purchaseDate, list.bestBefore, list.item_id, list.fridge_id,
+    item.name as item_name, item.place, item.freshDay, item.category_id,
+    fridge.name as fridge_name, fridge.location, fridge.type
+    from "list" 
+    join "item" on item_id=item.id 
+    join "fridge" on fridge_id=fridge.id
+    where fridge_id= $1`;
   const value = [req.params.id];
   client.query(text, value).then((result) => {
     res.send(result.rows);
