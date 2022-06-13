@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import userRouter from "./routes/user";
 import fridgeRouter from "./routes/fridgeList";
+import categoryRouter from "./routes/category";
+import itemRouter from "./routes/item";
 
 dotenv.config();
 
@@ -15,6 +17,10 @@ const port = process.env.PORT;
 app.use("/user", userRouter);
 
 app.use("/fridge", fridgeRouter);
+
+app.use("/category", categoryRouter);
+
+app.use("/item", itemRouter);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at https://localhost:${port}`);

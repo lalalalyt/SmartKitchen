@@ -1,14 +1,13 @@
-import { useContext} from "react";
+import { useContext } from "react";
 import { Grid } from "@mui/material";
 import FridgeList from "../content/FridgeList";
-import ItemList from "../content/ItemList";
+import ItemList from "../content/ItemList/ItemList";
 import { ModeContext } from "../../App";
 import { FridgeContext } from "./AppContainer";
 
-
 function MainContainer() {
   const [mode, transite] = useContext(ModeContext);
-  const [fridgeID, setFridgeID] = useContext(FridgeContext);
+  const { fridgeID } = useContext(FridgeContext);
   return (
     <Grid>
       {mode === "HOME" && (
@@ -18,7 +17,7 @@ function MainContainer() {
           }}
         />
       )}
-      {mode === "LIST" && <ItemList  fridgeID={fridgeID}/>}
+      {mode === "LIST" && <ItemList fridgeID={fridgeID} />}
     </Grid>
   );
 }
