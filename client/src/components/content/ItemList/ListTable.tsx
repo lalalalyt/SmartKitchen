@@ -8,7 +8,9 @@ import {
   Typography,
   Grid,
   Checkbox,
+  Rating,
 } from "@mui/material";
+import AddAlertIcon from "@mui/icons-material/AddAlert";
 import { dateDifference } from "../../../helpers/dateDifference";
 import { showDate } from "../../../helpers/showDate";
 import { showFresh } from "../../../helpers/showFresh";
@@ -79,7 +81,18 @@ function ListTable(props: ListTableProps) {
                         {dateDifference(item.bestbefore)}
                       </TableCell>
                       <TableCell align="center">
-                        {showFresh(item.purchasedate, item.bestbefore)}
+                        {showFresh(item.purchasedate, item.bestbefore) ===
+                          0 && <AddAlertIcon />}
+                        {showFresh(item.purchasedate, item.bestbefore) > 0 && (
+                          <Rating
+                            name="read-only"
+                            value={showFresh(
+                              item.purchasedate,
+                              item.bestbefore
+                            )}
+                            readOnly
+                          />
+                        )}
                       </TableCell>
                     </TableRow>
                   );
