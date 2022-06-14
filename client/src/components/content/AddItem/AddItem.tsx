@@ -10,6 +10,7 @@ import axios from "axios";
 import { FormEvent, useContext, useState } from "react";
 import ItemInput from "./ItemInput";
 import { FridgeContext } from "../../container/AppContainer";
+import { ItemList } from "../ItemList/ItemList";
 
 export interface Inputs {
   itemCategory: string;
@@ -17,6 +18,7 @@ export interface Inputs {
   quantity: number;
   purchaseDate: Date | null;
   bestBefore: Date | null;
+  itemID: number | null;
 }
 
 const defaultInputs: Inputs = {
@@ -25,18 +27,17 @@ const defaultInputs: Inputs = {
   quantity: 1,
   purchaseDate: new Date(),
   bestBefore: null,
+  itemID: null,
 };
 
-function AddItem() {
-  const [add, setAdd] = useState(false);
-  const { fridgeID } = useContext(FridgeContext);
-  const [inputs, setInputs] = useState<Inputs>(defaultInputs);
+interface AddItemProps {
+  setList: React.Dispatch<React.SetStateAction<ItemList[] | null>>;
+}
 
-  // const [itemCategory, setItemCategory] = useState<string>("");
-  // const [newItem, setnewItem] = useState<string>("");
-  // const [quantity, setQuantity] = useState<number>(1);
-  // const [purchaseDate, setPurchaseDate] = useState<Date | null>(new Date());
-  // const [bestBefore, setbestBefore] = useState<Date | null>(null);
+function AddItem({ setList }: AddItemProps) {
+  const [add, setAdd] = useState(false);
+  const { fridgeType, fridgeID } = useContext(FridgeContext);
+  const [inputs, setInputs] = useState<Inputs>(defaultInputs);
 
   const handleClickOpen = () => {
     setAdd(true);
@@ -47,9 +48,15 @@ function AddItem() {
   };
 
   const handleSave = () => {
-    console.log({inputs});
-    axios.post("/fridge/${fridgeID}", {});
     setAdd(false);
+    Promise.all([
+      axios.post(`/fridge/${fridgeID}`, inputs),
+      // axios.post(`/item/${fridgeType}/search/${inputs.newItem}`,),
+    ]).then(() => {
+      axios.get(`/fridge/${fridgeID}`).then((res) => {
+        res.data.length === 0 ? setList([]) : setList(res.data);
+      });
+    });
   };
   return (
     <>
@@ -61,14 +68,14 @@ function AddItem() {
         ADD
       </Button>
       <Dialog open={add} onClose={handleClose} fullWidth>
-        <form >
+        <form>
           <DialogTitle>Add new item</DialogTitle>
           <DialogContent>
             <ItemInput inputs={inputs} setInputs={setInputs} />
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleSave} >Save</Button>
+            <Button onClick={handleSave}>Save</Button>
           </DialogActions>
         </form>
       </Dialog>

@@ -66,7 +66,7 @@ function ItemList(props: ItemListProps) {
       </Typography>
 
       <Stack direction="row" spacing={2}>
-        <AddItem />
+        <AddItem setList={setList}/>
         <Button
           variant="contained"
           startIcon={<EditIcon />}

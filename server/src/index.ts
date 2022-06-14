@@ -4,6 +4,7 @@ import userRouter from "./routes/user";
 import fridgeRouter from "./routes/fridgeList";
 import categoryRouter from "./routes/category";
 import itemRouter from "./routes/item";
+import resetRouter from "./routes/resetDB";
 
 dotenv.config();
 
@@ -21,6 +22,8 @@ app.use("/fridge", fridgeRouter);
 app.use("/category", categoryRouter);
 
 app.use("/item", itemRouter);
+
+app.use("/reset", resetRouter);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at https://localhost:${port}`);

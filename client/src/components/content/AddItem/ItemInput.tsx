@@ -1,5 +1,4 @@
 import {
-  Autocomplete,
   FormControl,
   Grid,
   InputLabel,
@@ -8,6 +7,7 @@ import {
   SelectChangeEvent,
   TextField,
 } from "@mui/material";
+import Autocomplete, { createFilterOptions } from "@mui/material/Autocomplete";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
@@ -22,7 +22,7 @@ interface ItemInputProps {
   setInputs: React.Dispatch<React.SetStateAction<Inputs>>;
 }
 
-type items = {
+type Items = {
   id: number;
   item_name: string;
   place: "R" | "F";
@@ -30,8 +30,15 @@ type items = {
   category_name: string;
 };
 
+type ItemOption = {
+  inputValue?: string;
+  name: string;
+};
+
+const filter = createFilterOptions<ItemOption>();
+
 function ItemInput(props: ItemInputProps) {
-  const { itemCategory, newItem, quantity, purchaseDate, bestBefore } =
+  const { itemCategory, newItem, quantity, purchaseDate, bestBefore, itemID } =
     props.inputs;
   const setItemCategory = (category: string) =>
     props.setInputs((prev) => ({ ...prev, itemCategory: category }));
@@ -48,11 +55,14 @@ function ItemInput(props: ItemInputProps) {
   const setBestBefore = (bestBefore: Date | null) =>
     props.setInputs((prev) => ({ ...prev, bestBefore }));
 
+  const setItemID = (ItemID: number | null) =>
+    props.setInputs((prev) => ({ ...prev, itemID }));
+
   const { fridgeType } = useContext(FridgeContext);
   const [allCategory, setAllCategory] = useState<null | Array<CategoryType>>(
     null
   );
-  const [itemList, setItemList] = useState<Array<items>>([]);
+  const [itemList, setItemList] = useState<Array<Items>>([]);
 
   useEffect(() => {
     axios.get(`/category`).then((res) => {
@@ -73,13 +83,15 @@ function ItemInput(props: ItemInputProps) {
   ) => {
     setNewItem(value ?? "");
     axios.get(`/item/${fridgeType}/search/${value}`).then((res) => {
-      setBestBefore(
-        value
+      props.setInputs((prev) => ({
+        ...prev,
+        itemID: res.data[0] ?? null,
+        bestBefore: res.data[0]
           ? new Date(
               new Date().getTime() + res.data[0].freshday * 24 * 60 * 60 * 1000
             )
-          : null
-      );
+          : null,
+      }));
     });
   };
 
@@ -89,9 +101,9 @@ function ItemInput(props: ItemInputProps) {
     </MenuItem>
   ));
 
-  const itemOption = [];
+  const itemOption: ItemOption[] = [];
   for (const item of itemList) {
-    itemOption.push(item.item_name);
+    itemOption.push({ name: item.item_name });
   }
 
   return (
@@ -117,13 +129,40 @@ function ItemInput(props: ItemInputProps) {
           </Select>
         </FormControl>
         <Autocomplete
+          filterOptions={(options, params) => {
+            const filtered = filter(options, params);
+
+            const { inputValue } = params;
+            // Suggest the creation of a new value
+            const isExisting = options.some(
+              (option) => inputValue === option.name
+            );
+            if (inputValue !== "" && !isExisting) {
+              filtered.push({ inputValue, name: `Add "${inputValue}"` });
+            }
+
+            return filtered;
+          }}
           freeSolo={true}
           selectOnFocus
           sx={{ width: 0.3, m: 1 }}
           disablePortal
           options={itemOption}
-          value={newItem}
-          onChange={handleItemName}
+          getOptionLabel={(option) => {
+            // Value selected with enter, right from the input
+            if (typeof option === "string") {
+              return option;
+            }
+            // Add "xxx" option created dynamically
+            if (option.inputValue) {
+              return option.inputValue;
+            }
+            // Regular option
+            return option.name;
+          }}
+          inputValue={newItem}
+          onInputChange={handleItemName}
+          renderOption={(props, option) => <li {...props}>{option.name}</li>}
           renderInput={(params) => <TextField {...params} label="Name" />}
         />
         <TextField
