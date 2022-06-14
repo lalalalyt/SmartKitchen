@@ -24,4 +24,14 @@ itemRouter.get("/:fridge_type/:category_name", (req, res) => {
   });
 });
 
+itemRouter.get("/:fridge_type/search/:item_name", (req, res) => {
+  const text = `select *
+    from "item" 
+    where place=$1 and name=$2`;
+  const value = [req.params.fridge_type, req.params.item_name];
+  client.query(text, value).then((result) => {
+    res.send(result.rows);
+    console.log("This item successfully pulled!", result.rows);
+  });
+});
 export default itemRouter;
