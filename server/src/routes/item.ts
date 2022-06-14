@@ -34,4 +34,16 @@ itemRouter.get("/:fridge_type/search/:item_name", (req, res) => {
     console.log("This item successfully pulled!", result.rows);
   });
 });
+// itemRouter.post("/:fridge_type/search/:item_name", (req, res) => {
+//   console.log("got body", req.body);
+//   const text = `INSERT INTO "item" (name, place, freshDay, categoryID)
+//   VALUES ($1, $2, $3, $4);`;
+
+//   const value = [
+//   ];
+//   client.query(text, value).then((result) => {
+//     res.send(result.rows);
+//     console.log("This item successfully pulled!", result.rows);
+//   });
+// });
 export default itemRouter;

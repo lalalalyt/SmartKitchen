@@ -29,7 +29,7 @@ function FridgeList(props: FridgeListProps) {
     axios.get("/fridge").then((res) => {
       setFridgeList(res.data);
     });
-  });
+  },[]);
 
   return (
     <List sx={{ width: "100%", maxWidth: 100, bgcolor: "background.paper" }}>

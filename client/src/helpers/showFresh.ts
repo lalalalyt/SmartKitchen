@@ -5,8 +5,9 @@ export const showFresh = (date1: string, date2: string) => {
   if (dateDifference(date2) === 0) {
     return 0;
   } else {
-    return Math.ceil(
-      (dateDifference(date2) / dateDifference(date1, date2)) % 0.2
+    const fresh = Math.round(
+      (dateDifference(date2) / dateDifference(date2, date1)) * 5
     );
+    return fresh;
   }
 };
