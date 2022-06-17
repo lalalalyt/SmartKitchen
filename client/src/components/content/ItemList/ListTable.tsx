@@ -9,98 +9,262 @@ import {
   Grid,
   Checkbox,
   Rating,
+  Button,
+  IconButton,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
 import AddAlertIcon from "@mui/icons-material/AddAlert";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import EditIcon from "@mui/icons-material/Edit";
+import { useContext, useState } from "react";
 import { dateDifference } from "../../../helpers/dateDifference";
 import { showDate } from "../../../helpers/showDate";
 import { showFresh } from "../../../helpers/showFresh";
 import { ItemList } from "./ItemList";
+import axios from "axios";
+import { FridgeContext } from "../../container/AppContainer";
+import ItemInput from "../AddItem/ItemInput";
+import AddItem, { defaultInputs, Inputs } from "../AddItem/AddItem";
+import InfoDialog from "../AddItem/InfoDialog";
 
 interface ListTableProps {
   list: null | Array<ItemList>;
   edit: string;
   category: null | number;
+  selected: Array<string>;
+  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
+  setList: React.Dispatch<React.SetStateAction<ItemList[] | null>>;
+  setEdit: React.Dispatch<React.SetStateAction<string>>;
 }
 
 function ListTable(props: ListTableProps) {
-  const { list, edit, category } = props;
+  const { list, edit, category, selected, setSelected, setList, setEdit } =
+    props;
+  const { fridgeID } = useContext(FridgeContext);
+  const [change, setChange] = useState(false);
+  const [inputs, setInputs] = useState<Inputs>(defaultInputs);
+
+  const handleClick = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    name: string
+  ) => {
+    const selectedIndex = selected.indexOf(name);
+    let newSelected: string[] = [];
+
+    if (selectedIndex === -1) {
+      newSelected = newSelected.concat(selected, name);
+    } else if (selectedIndex === 0) {
+      newSelected = newSelected.concat(selected.slice(1));
+    } else if (selectedIndex === selected.length - 1) {
+      newSelected = newSelected.concat(selected.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelected = newSelected.concat(
+        selected.slice(0, selectedIndex),
+        selected.slice(selectedIndex + 1)
+      );
+    }
+    setSelected(newSelected);
+  };
+
+  const handleAllSelect = () => {
+    if (selected.length === list?.length) {
+      setSelected([]);
+    } else {
+      let newSelected: string[] = [];
+      list?.forEach((item) => {
+        newSelected = [...newSelected, item.item_name];
+      });
+      setSelected(newSelected);
+    }
+  };
+  const isSelected = (name: string) => selected.indexOf(name) !== -1;
+  const isAllSelected = () => selected.length === list?.length;
+
+  const handleDelete = () => {
+    axios.delete(`fridge/:${fridgeID}`, { data: { selected } }).then(() => {
+      setList((prev) => {
+        if (prev) {
+          const newList = prev?.filter(
+            (item) => selected.indexOf(item.item_name) === -1
+          );
+          return newList;
+        }
+        return null;
+      });
+    });
+  };
+
+  const handleChangeOpen = () => {
+    setChange(true);
+    if (list) {
+      setInputs(() => {
+        const changeItem = list.filter(
+          (item) => item.item_name === selected[0]
+        );
+        return {
+          itemCategory: changeItem[0].category_name,
+          newItem: changeItem[0].item_name,
+          quantity: changeItem[0].quantity,
+          purchaseDate: new Date(changeItem[0].purchasedate),
+          bestBefore: new Date(changeItem[0].bestbefore),
+          itemID: changeItem[0].item_id,
+        };
+      });
+    }
+  };
+
+  const handleChangeSave = () => {
+    setChange(false);
+    setInputs(defaultInputs);
+    console.log("Changed the info");
+  };
+  const handleChangeClose = () => {
+    setChange(false);
+    setInputs(defaultInputs);
+  };
+
   return (
     <Grid>
       {list?.length === 0 && (
         <Typography>Your fridge is empty! Start to add items now!</Typography>
       )}
       {list && list.length !== 0 && (
-        <TableContainer>
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                {edit === "open" && (
-                  <TableCell padding="checkbox">
-                    <Checkbox
-                      color="primary"
-                      inputProps={{
-                        "aria-label": "select all desserts",
-                      }}
-                    />
-                  </TableCell>
-                )}
-                <TableCell align="center">id</TableCell>
-                <TableCell align="center">name</TableCell>
-                <TableCell align="center">quantity</TableCell>
-                <TableCell align="center">purchase date</TableCell>
-                <TableCell align="center">best before</TableCell>
-                <TableCell align="center">remaining days</TableCell>
-                <TableCell align="center">fresh</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {list.map((item) => {
-                if (!category || category === item.category_id) {
-                  return (
-                    <TableRow
-                      key={list.indexOf(item) + 1}
-                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
-                    >
-                      {edit === "open" && (
-                        <TableCell padding="checkbox">
-                          <Checkbox color="primary" />
-                        </TableCell>
-                      )}
-                      <TableCell component="th" scope="row">
-                        {list.indexOf(item) + 1}
-                      </TableCell>
-                      <TableCell align="center">{item.item_name}</TableCell>
-                      <TableCell align="center">{item.quantity}</TableCell>
-                      <TableCell align="center">
-                        {showDate(item.purchasedate)}
-                      </TableCell>
-                      <TableCell align="center">
-                        {showDate(item.bestbefore)}
-                      </TableCell>
-                      <TableCell align="center">
-                        {dateDifference(item.bestbefore)}
-                      </TableCell>
-                      <TableCell align="center">
-                        {showFresh(item.purchasedate, item.bestbefore) ===
-                          0 && <AddAlertIcon />}
-                        {showFresh(item.purchasedate, item.bestbefore) > 0 && (
-                          <Rating
-                            name="read-only"
-                            value={showFresh(
-                              item.purchasedate,
-                              item.bestbefore
-                            )}
-                            readOnly
-                          />
+        <>
+          <TableContainer>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  {edit === "open" && (
+                    <TableCell padding="checkbox">
+                      <Checkbox
+                        color="primary"
+                        checked={isAllSelected()}
+                        onChange={handleAllSelect}
+                        inputProps={{
+                          "aria-label": "select all foods",
+                        }}
+                      />
+                    </TableCell>
+                  )}
+                  <TableCell align="center">id</TableCell>
+                  <TableCell align="center">name</TableCell>
+                  <TableCell align="center">quantity</TableCell>
+                  <TableCell align="center">purchase date</TableCell>
+                  <TableCell align="center">best before</TableCell>
+                  <TableCell align="center">remaining days</TableCell>
+                  <TableCell align="center">fresh</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {list.map((item) => {
+                  if (!category || category === item.category_id) {
+                    const isItemSelected = isSelected(item.item_name);
+                    return (
+                      <TableRow
+                        key={list.indexOf(item) + 1}
+                        sx={{
+                          "&:last-child td, &:last-child th": { border: 0 },
+                        }}
+                      >
+                        {edit === "open" && (
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              color="primary"
+                              checked={isItemSelected}
+                              onChange={(event) =>
+                                handleClick(event, item.item_name)
+                              }
+                            />
+                          </TableCell>
                         )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                }
-              })}
-            </TableBody>
-          </Table>
-        </TableContainer>
+                        <TableCell component="th" scope="row">
+                          {list.indexOf(item) + 1}
+                        </TableCell>
+                        <TableCell align="center">{item.item_name}</TableCell>
+                        <TableCell align="center">{item.quantity}</TableCell>
+                        <TableCell align="center">
+                          {showDate(item.purchasedate)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {showDate(item.bestbefore)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {dateDifference(item.bestbefore)}
+                        </TableCell>
+                        <TableCell align="center">
+                          {showFresh(item.purchasedate, item.bestbefore) ===
+                            0 && <AddAlertIcon />}
+                          {showFresh(item.purchasedate, item.bestbefore) >
+                            0 && (
+                            <Rating
+                              name="read-only"
+                              value={showFresh(
+                                item.purchasedate,
+                                item.bestbefore
+                              )}
+                              readOnly
+                            />
+                          )}
+                        </TableCell>
+                        {isItemSelected && (
+                          <TableCell align="center">
+                            <IconButton onClick={handleDelete}>
+                              <DeleteIcon />
+                            </IconButton>
+                            <IconButton>
+                              <ShoppingCartIcon />
+                            </IconButton>
+                            <IconButton>
+                              <EditIcon />
+                            </IconButton>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    );
+                  }
+                })}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {edit === "open" && selected.length !== 0 && (
+            <Grid>
+              <Button
+                onClick={handleDelete}
+                sx={{ m: 2 }}
+                variant={"outlined"}
+                startIcon={<DeleteIcon />}
+              >
+                Delete from fridge
+              </Button>
+              <Button
+                sx={{ m: 2 }}
+                variant={"outlined"}
+                startIcon={<ShoppingCartIcon />}
+              >
+                Delete & Add into shopping list
+              </Button>
+              <Button
+                onClick={handleChangeOpen}
+                sx={{ m: 2 }}
+                variant={"outlined"}
+                startIcon={<EditIcon />}
+              >
+                Change the info of item
+              </Button>
+            </Grid>
+          )}
+          <InfoDialog
+            open={change}
+            inputs={inputs}
+            setInputs={setInputs}
+            handleClose={handleChangeClose}
+            handleSave={handleChangeSave}
+          />
+        </>
       )}
     </Grid>
   );

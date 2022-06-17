@@ -2,6 +2,18 @@ import express from "express";
 import { client } from "../db/db";
 
 const itemRouter = express.Router();
+const bodyParser = require("body-parser");
+itemRouter.use(bodyParser.urlencoded({ extended: true }));
+itemRouter.use(bodyParser.json());
+
+itemRouter.get("/", (req, res) => {
+  const text = `
+  select * from "item"`;
+  client.query(text).then((result) => {
+    res.send(result.rows);
+    console.log("all items successfully pulled!", result.rows);
+  });
+});
 
 itemRouter.get("/:fridge_type", (req, res) => {
   const text = `select * from "item" 
@@ -9,7 +21,10 @@ itemRouter.get("/:fridge_type", (req, res) => {
   const value = [req.params.fridge_type];
   client.query(text, value).then((result) => {
     res.send(result.rows);
-    console.log("all items successfully pulled!", result.rows);
+    console.log(
+      "all items for this type of fridge successfully pulled!",
+      result.rows
+    );
   });
 });
 itemRouter.get("/:fridge_type/:category_name", (req, res) => {
@@ -34,16 +49,32 @@ itemRouter.get("/:fridge_type/search/:item_name", (req, res) => {
     console.log("This item successfully pulled!", result.rows);
   });
 });
-// itemRouter.post("/:fridge_type/search/:item_name", (req, res) => {
-//   console.log("got body", req.body);
-//   const text = `INSERT INTO "item" (name, place, freshDay, categoryID)
-//   VALUES ($1, $2, $3, $4);`;
 
-//   const value = [
-//   ];
-//   client.query(text, value).then((result) => {
-//     res.send(result.rows);
-//     console.log("This item successfully pulled!", result.rows);
-//   });
-// });
+itemRouter.post("/:fridge_type/search/:item_name", (req, res) => {
+  const text = `
+  insert into "item" (category_id, name, place, freshDay, id )
+  select id, $2, $3, $4, setval(pg_get_serial_sequence('item', 'id'), (SELECT MAX(id) FROM "item")+1) from "category"
+  where name=$1;
+`;
+  const value = [
+    req.body.itemCategory,
+    req.body.name,
+    req.body.place,
+    req.body.freshDay,
+  ];
+
+  client.query(text, value).then(() => {
+    console.log("New item added!");
+  });
+
+  client
+    .query(
+      `SELECT MAX(id) FROM "item"`
+    )
+    .then((result) => {
+      res.send({item_id: result.rows[0].max});
+    });
+});
+
 export default itemRouter;
+

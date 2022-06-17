@@ -9,6 +9,7 @@ export type CategoryType = {
 
 interface CategoryProps {
   onClick: React.Dispatch<React.SetStateAction<number | null>>;
+  selectedCategory: null | number;
 }
 
 function Category(props: CategoryProps) {
@@ -20,11 +21,30 @@ function Category(props: CategoryProps) {
     });
   }, []);
   const categoryButton = category?.map((eachType) => (
-    <Button key={eachType.id} onClick={() => props.onClick(eachType.id)}>
+    <Button
+      variant={
+        eachType.id === props.selectedCategory ? "contained" : "outlined"
+      }
+      sx={{ m: 1, width: 100 }}
+      key={eachType.id}
+      onClick={() => props.onClick(eachType.id)}
+    >
       {eachType.name}
     </Button>
   ));
-  return <>{categoryButton}</>;
+  return (
+    <>
+      {categoryButton}
+      <Button
+        variant={props.selectedCategory ? "outlined" : "contained"}
+        sx={{ m: 1, width: 100 }}
+        key={-1}
+        onClick={() => props.onClick(null)}
+      >
+        ALL
+      </Button>
+    </>
+  );
 }
 
 export default Category;

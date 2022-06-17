@@ -1,6 +1,8 @@
 import { Typography, Stack, Button, Grid } from "@mui/material";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -19,6 +21,7 @@ export type ItemList = {
   place: "R" | "F";
   freshday: number;
   category_id: number;
+  category_name: string;
   fridge_name: string;
   location: string;
   type: "R" | "F";
@@ -36,6 +39,7 @@ interface ItemListProps {
 
 function ItemList(props: ItemListProps) {
   const [edit, setEdit] = useState<string>("close");
+  const [selected, setSelected] = useState<Array<string>>([]);
   const [selectedCategory, setSelectedCategory] = useState<null | number>(null);
   const [list, setList] = useState<null | Array<ItemList>>(null);
   const [fridgeInfo, setFridgeInfo] = useState<FridgeInfo>({
@@ -65,19 +69,37 @@ function ItemList(props: ItemListProps) {
         {fridgeInfo.type} - {fridgeInfo.location}
       </Typography>
 
-      <Stack direction="row" spacing={2}>
-        <AddItem setList={setList}/>
+      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+        <AddItem
+          setList={setList}
+          setEdit={setEdit}
+          setSelected={setSelected}
+        />
         <Button
-          variant="contained"
+          variant={edit === "open" ? "contained" : "outlined"}
           startIcon={<EditIcon />}
-          onClick={() => setEdit("open")}
+          onClick={() => {
+            setEdit(edit === "close" ? "open" : "close");
+            setSelected([]);
+          }}
         >
           EDIT
         </Button>
       </Stack>
 
-      <Category onClick={setSelectedCategory} />
-      <ListTable list={list} edit={edit} category={selectedCategory} />
+      <Category
+        selectedCategory={selectedCategory}
+        onClick={setSelectedCategory}
+      />
+      <ListTable
+        list={list}
+        edit={edit}
+        category={selectedCategory}
+        selected={selected}
+        setSelected={setSelected}
+        setList={setList}
+        setEdit={setEdit}
+      />
     </Grid>
   );
 }

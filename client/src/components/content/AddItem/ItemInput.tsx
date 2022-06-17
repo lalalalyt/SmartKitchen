@@ -38,7 +38,7 @@ type ItemOption = {
 const filter = createFilterOptions<ItemOption>();
 
 function ItemInput(props: ItemInputProps) {
-  const { itemCategory, newItem, quantity, purchaseDate, bestBefore, itemID } =
+  const { itemCategory, newItem, quantity, purchaseDate, bestBefore } =
     props.inputs;
   const setItemCategory = (category: string) =>
     props.setInputs((prev) => ({ ...prev, itemCategory: category }));
@@ -55,8 +55,8 @@ function ItemInput(props: ItemInputProps) {
   const setBestBefore = (bestBefore: Date | null) =>
     props.setInputs((prev) => ({ ...prev, bestBefore }));
 
-  const setItemID = (ItemID: number | null) =>
-    props.setInputs((prev) => ({ ...prev, itemID }));
+  // const setItemID = (ItemID: number | null) =>
+  //   props.setInputs((prev) => ({ ...prev, itemID }));
 
   const { fridgeType } = useContext(FridgeContext);
   const [allCategory, setAllCategory] = useState<null | Array<CategoryType>>(
@@ -85,7 +85,7 @@ function ItemInput(props: ItemInputProps) {
     axios.get(`/item/${fridgeType}/search/${value}`).then((res) => {
       props.setInputs((prev) => ({
         ...prev,
-        itemID: res.data[0] ?? null,
+        itemID: res.data[0] ? res.data[0].id : null,
         bestBefore: res.data[0]
           ? new Date(
               new Date().getTime() + res.data[0].freshday * 24 * 60 * 60 * 1000
@@ -117,17 +117,20 @@ function ItemInput(props: ItemInputProps) {
           justifyContent: "space-evenly",
         }}
       >
-        <FormControl sx={{ width: 0.3, m: 1 }}>
-          <InputLabel>Category</InputLabel>
-          <Select
-            name="category"
-            value={itemCategory}
-            label="Category"
-            onChange={handleCategory}
-          >
-            {categoryMenu}
-          </Select>
-        </FormControl>
+        {categoryMenu && (
+          <FormControl sx={{ width: 0.3, m: 1 }}>
+            <InputLabel>Category</InputLabel>
+            <Select
+              name="category"
+              value={itemCategory}
+              label="Category"
+              onChange={handleCategory}
+              defaultValue=""
+            >
+              {categoryMenu}
+            </Select>
+          </FormControl>
+        )}
         <Autocomplete
           filterOptions={(options, params) => {
             const filtered = filter(options, params);
