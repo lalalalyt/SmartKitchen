@@ -8,9 +8,10 @@ import {
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import axios from "axios";
 import { FormEvent, useContext, useState } from "react";
-import ItemInput from "./ItemInput";
 import { FridgeContext } from "../../container/AppContainer";
 import { ItemList } from "../ItemList/ItemList";
+import { dateDifference } from "../../../helpers/dateDifference";
+import InfoDialog from "./InfoDialog";
 
 export interface Inputs {
   itemCategory: string;
@@ -21,7 +22,7 @@ export interface Inputs {
   itemID: number | null;
 }
 
-const defaultInputs: Inputs = {
+export const defaultInputs: Inputs = {
   itemCategory: "",
   newItem: "",
   quantity: 1,
@@ -32,31 +33,60 @@ const defaultInputs: Inputs = {
 
 interface AddItemProps {
   setList: React.Dispatch<React.SetStateAction<ItemList[] | null>>;
+  setEdit: React.Dispatch<React.SetStateAction<string>>;
+  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
-function AddItem({ setList }: AddItemProps) {
+function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
   const [add, setAdd] = useState(false);
   const { fridgeType, fridgeID } = useContext(FridgeContext);
   const [inputs, setInputs] = useState<Inputs>(defaultInputs);
 
   const handleClickOpen = () => {
     setAdd(true);
+    setEdit("close");
+    setSelected([]);
   };
 
   const handleClose = () => {
     setAdd(false);
+    setInputs(defaultInputs);
   };
 
   const handleSave = () => {
     setAdd(false);
-    Promise.all([
-      axios.post(`/fridge/${fridgeID}`, inputs),
-      // axios.post(`/item/${fridgeType}/search/${inputs.newItem}`,),
-    ]).then(() => {
-      axios.get(`/fridge/${fridgeID}`).then((res) => {
-        res.data.length === 0 ? setList([]) : setList(res.data);
+    if (!inputs.itemID && inputs.bestBefore && inputs.purchaseDate) {
+      axios
+        .post(`/item/${fridgeType}/search/${inputs.newItem}`, {
+          name: inputs.newItem,
+          place: fridgeType,
+          freshDay: dateDifference(
+            inputs.bestBefore.toString(),
+            inputs.purchaseDate?.toString()
+          ),
+          itemCategory: inputs.itemCategory,
+        })
+        .then((res) => {
+          setInputs((prev) => ({ ...prev, itemID: res.data.item_id }));
+          axios
+            .post(`/fridge/${fridgeID}`, {
+              ...inputs,
+              itemID: res.data.item_id,
+            })
+            .then(() => {
+              axios.get(`/fridge/${fridgeID}`).then((res) => {
+                res.data.length === 0 ? setList([]) : setList(res.data);
+              });
+            });
+        });
+    } else {
+      axios.post(`/fridge/${fridgeID}`, inputs).then(() => {
+        axios.get(`/fridge/${fridgeID}`).then((res) => {
+          res.data.length === 0 ? setList([]) : setList(res.data);
+        });
       });
-    });
+    }
+    setInputs(defaultInputs);
   };
   return (
     <>
@@ -67,18 +97,13 @@ function AddItem({ setList }: AddItemProps) {
       >
         ADD
       </Button>
-      <Dialog open={add} onClose={handleClose} fullWidth>
-        <form>
-          <DialogTitle>Add new item</DialogTitle>
-          <DialogContent>
-            <ItemInput inputs={inputs} setInputs={setInputs} />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleSave}>Save</Button>
-          </DialogActions>
-        </form>
-      </Dialog>
+      <InfoDialog
+        open={add}
+        inputs={inputs}
+        setInputs={setInputs}
+        handleClose={handleClose}
+        handleSave={handleSave}
+      />
     </>
   );
 }

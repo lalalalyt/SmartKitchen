@@ -13,7 +13,7 @@ const dataFiles = fs
 resetRouter.get("/", (req, res) => {
   client
     .query(
-      `DROP TABLE IF EXISTS "user", "fridge","category","item","userItem","list"`
+      `DROP TABLE IF EXISTS "user", "fridge","category","item","userItem","list", "deleteArray"`
     )
     .then(() => {
       const createTable = fs

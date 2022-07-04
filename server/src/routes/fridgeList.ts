@@ -15,11 +15,12 @@ fridgeRouter.get("/", (req, res) => {
 
 fridgeRouter.get("/:id", (req, res) => {
   const text = `select list.id, list.quantity, list.purchaseDate, list.bestBefore, list.item_id, list.fridge_id,
-    item.name as item_name, item.place, item.freshDay, item.category_id,
+    item.name as item_name, item.place, item.freshDay, item.category_id, category.name as category_name,
     fridge.name as fridge_name, fridge.location, fridge.type
     from "list" 
-    left join "item" on item_id=item.id 
-    left join "fridge" on fridge_id=fridge.id
+    join "item" on item_id=item.id 
+    join "category" on item.category_id=category.id
+    join "fridge" on fridge_id=fridge.id
     where fridge_id= $1`;
   const value = [req.params.id];
   client.query(text, value).then((result) => {
@@ -31,7 +32,7 @@ fridgeRouter.get("/:id", (req, res) => {
 fridgeRouter.post("/:id", (req, res) => {
   console.log("got body", req.body);
   const text = `INSERT INTO "list" (quantity, purchaseDate, bestBefore, item_id, fridge_id, id)
-  VALUES ($1, $2, $3, $4, $5, 4);`;
+  VALUES ($1, $2, $3, $4, $5, setval(pg_get_serial_sequence('list', 'id'), (SELECT MAX(id) FROM "list")+1) );`;
 
   const value = [
     req.body.quantity,
@@ -41,12 +42,32 @@ fridgeRouter.post("/:id", (req, res) => {
     req.params.id,
   ];
   client.query(text, value).then((result) => {
-    console.log("new item successfully added!", result.rows);
+    console.log("new item successfully added into the fridge!", result.rows);
     res.send("success");
   });
 });
 
-export default fridgeRouter;
+fridgeRouter.delete("/:id", async (req, res) => {
+  console.log("got body", req.body.selected);
+  await client
+    .query(`create table "deleteArray"(name VARCHAR (255) UNIQUE NOT NULL)`)
+    .then(() => {
+      console.log("Temp table is created.");
+      req.body.selected.forEach((item: string) => {
+        client.query(`insert into "deleteArray" (name) values($1)`, [item]);
+      });
+    });
 
-// INSERT INTO "item" (name, place, freshDay, categoryID)
-// VALUES ($1, $2, $3, $4, $5, 3);`;
+  const text = `
+  delete from "list"
+  where item_id IN (
+    select item.id from "item" where name IN 
+      (select * from "deleteArray")
+  )`;
+  client.query(text).then(() => {
+    console.log("Seleted items are successfully deleted!");
+    client.query(`drop table "deleteArray" `);
+  });
+  res.send("sucessfully deleted");
+});
+export default fridgeRouter;
