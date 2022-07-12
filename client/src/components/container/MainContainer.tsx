@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { Grid } from "@mui/material";
-import FridgeList from "../content/FridgeList";
+import FridgeList from "../content/ManageFridge/FridgeList";
 import ItemList from "../content/ItemList/ItemList";
 import { ModeContext } from "../../App";
 import { FridgeContext } from "./AppContainer";

@@ -1,6 +1,7 @@
 import express from "express";
 import { client } from "../db/db";
 import fs from "fs";
+import bcrypt from "bcryptjs";
 
 const resetRouter = express.Router();
 const dataFiles = fs

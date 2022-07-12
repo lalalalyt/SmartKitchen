@@ -1,13 +1,7 @@
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
+import { Button } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import axios from "axios";
-import { FormEvent, useContext, useState } from "react";
+import { useContext, useState } from "react";
 import { FridgeContext } from "../../container/AppContainer";
 import { ItemList } from "../ItemList/ItemList";
 import { dateDifference } from "../../../helpers/dateDifference";
@@ -79,8 +73,16 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
               });
             });
         });
-    } else {
-      axios.post(`/fridge/${fridgeID}`, inputs).then(() => {
+    } else if (inputs.itemID && inputs.bestBefore && inputs.purchaseDate) {
+      Promise.all([
+        axios.put(`/item/${fridgeType}/search/${inputs.newItem}`, {
+          freshDay: dateDifference(
+            inputs.bestBefore.toString(),
+            inputs.purchaseDate?.toString()
+          ),
+        }),
+        axios.post(`/fridge/${fridgeID}`, inputs),
+      ]).then(() => {
         axios.get(`/fridge/${fridgeID}`).then((res) => {
           res.data.length === 0 ? setList([]) : setList(res.data);
         });

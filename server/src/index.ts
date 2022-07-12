@@ -5,6 +5,7 @@ import fridgeRouter from "./routes/fridgeList";
 import categoryRouter from "./routes/category";
 import itemRouter from "./routes/item";
 import resetRouter from "./routes/resetDB";
+import loginRouter from "./routes/login"
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ const port = process.env.PORT;
 // });
 
 app.use("/user", userRouter);
+
+app.use("/login", loginRouter);
 
 app.use("/fridge", fridgeRouter);
 

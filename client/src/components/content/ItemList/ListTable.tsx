@@ -11,10 +11,6 @@ import {
   Rating,
   Button,
   IconButton,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
 } from "@mui/material";
 import AddAlertIcon from "@mui/icons-material/AddAlert";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -27,8 +23,7 @@ import { showFresh } from "../../../helpers/showFresh";
 import { ItemList } from "./ItemList";
 import axios from "axios";
 import { FridgeContext } from "../../container/AppContainer";
-import ItemInput from "../AddItem/ItemInput";
-import AddItem, { defaultInputs, Inputs } from "../AddItem/AddItem";
+import { defaultInputs, Inputs } from "../AddItem/AddItem";
 import InfoDialog from "../AddItem/InfoDialog";
 
 interface ListTableProps {
@@ -134,10 +129,10 @@ function ListTable(props: ListTableProps) {
       )}
       {list && list.length !== 0 && (
         <>
-          <TableContainer>
-            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+          <TableContainer sx={{ width: 900 }}>
+            <Table aria-label="simple table">
               <TableHead>
-                <TableRow>
+                <TableRow sx={{ height: 80 }}>
                   {edit === "open" && (
                     <TableCell padding="checkbox">
                       <Checkbox
@@ -150,13 +145,28 @@ function ListTable(props: ListTableProps) {
                       />
                     </TableCell>
                   )}
-                  <TableCell align="center">id</TableCell>
-                  <TableCell align="center">name</TableCell>
-                  <TableCell align="center">quantity</TableCell>
-                  <TableCell align="center">purchase date</TableCell>
-                  <TableCell align="center">best before</TableCell>
-                  <TableCell align="center">remaining days</TableCell>
-                  <TableCell align="center">fresh</TableCell>
+                  <TableCell width="6%" align="center">
+                    id
+                  </TableCell>
+                  <TableCell width="11%" align="center">
+                    name
+                  </TableCell>
+                  <TableCell width="11%" align="center">
+                    quantity
+                  </TableCell>
+                  <TableCell width="14%" align="center">
+                    purchase date
+                  </TableCell>
+                  <TableCell width="14%" align="center">
+                    best before
+                  </TableCell>
+                  <TableCell width="14%" align="center">
+                    remaining days
+                  </TableCell>
+                  <TableCell width="20%" align="center">
+                    fresh
+                  </TableCell>
+                  <TableCell width="10%" align="center"></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -167,6 +177,7 @@ function ListTable(props: ListTableProps) {
                       <TableRow
                         key={list.indexOf(item) + 1}
                         sx={{
+                          height: 80,
                           "&:last-child td, &:last-child th": { border: 0 },
                         }}
                       >
@@ -181,7 +192,7 @@ function ListTable(props: ListTableProps) {
                             />
                           </TableCell>
                         )}
-                        <TableCell component="th" scope="row">
+                        <TableCell align="center" component="th" scope="row">
                           {list.indexOf(item) + 1}
                         </TableCell>
                         <TableCell align="center">{item.item_name}</TableCell>
@@ -210,19 +221,13 @@ function ListTable(props: ListTableProps) {
                             />
                           )}
                         </TableCell>
-                        {isItemSelected && (
-                          <TableCell align="center">
+                        <TableCell align="center">
+                          {isItemSelected && (
                             <IconButton onClick={handleDelete}>
                               <DeleteIcon />
                             </IconButton>
-                            <IconButton>
-                              <ShoppingCartIcon />
-                            </IconButton>
-                            <IconButton>
-                              <EditIcon />
-                            </IconButton>
-                          </TableCell>
-                        )}
+                          )}
+                        </TableCell>
                       </TableRow>
                     );
                   }
@@ -240,7 +245,7 @@ function ListTable(props: ListTableProps) {
               >
                 Delete from fridge
               </Button>
-              <Button
+              {/* <Button
                 sx={{ m: 2 }}
                 variant={"outlined"}
                 startIcon={<ShoppingCartIcon />}
@@ -254,7 +259,7 @@ function ListTable(props: ListTableProps) {
                 startIcon={<EditIcon />}
               >
                 Change the info of item
-              </Button>
+              </Button> */}
             </Grid>
           )}
           <InfoDialog
