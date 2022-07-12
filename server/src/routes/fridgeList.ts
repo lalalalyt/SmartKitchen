@@ -13,6 +13,16 @@ fridgeRouter.get("/", (req, res) => {
   });
 });
 
+fridgeRouter.post("/", (req, res) => {
+  const text = `INSERT INTO "fridge"(id, type, name, user_id)
+  VALUES (setval(pg_get_serial_sequence('fridge', 'id'), (SELECT MAX(id) FROM "fridge")+1), $1, $2, $3)`;
+  const value = [req.body.type, req.body.name, req.body.user_id];
+  client.query(text, value).then((result) => {
+    console.log("Add new fridge!");
+    res.send("successfully added");
+  });
+});
+
 fridgeRouter.get("/:id", (req, res) => {
   const text = `select list.id, list.quantity, list.purchaseDate, list.bestBefore, list.item_id, list.fridge_id,
     item.name as item_name, item.place, item.freshDay, item.category_id, category.name as category_name,

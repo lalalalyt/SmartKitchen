@@ -1,14 +1,20 @@
-import { Typography, Stack, Button, Grid } from "@mui/material";
+import {
+  Typography,
+  Stack,
+  Button,
+  Grid,
+  Box,
+  CircularProgress,
+} from "@mui/material";
 import AcUnitIcon from "@mui/icons-material/AcUnit";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 import AddItem from "../AddItem/AddItem";
 import ListTable from "./ListTable";
-import Category from "./Category";
+import Category, { CategoryType } from "./Category";
+import { Fridge } from "../ManageFridge/FridgeList";
 
 export type ItemList = {
   id: number;
@@ -42,6 +48,7 @@ function ItemList(props: ItemListProps) {
   const [selected, setSelected] = useState<Array<string>>([]);
   const [selectedCategory, setSelectedCategory] = useState<null | number>(null);
   const [list, setList] = useState<null | Array<ItemList>>(null);
+  const [category, setCategory] = useState<null | Array<CategoryType>>(null);
   const [fridgeInfo, setFridgeInfo] = useState<FridgeInfo>({
     fridge_id: 0,
     fridge_name: "",
@@ -50,56 +57,82 @@ function ItemList(props: ItemListProps) {
   });
 
   useEffect(() => {
-    axios.get(`/fridge/${props.fridgeID}`).then((res) => {
-      res.data.length === 0 ? setList([]) : setList(res.data);
+    Promise.all([
+      axios.get(`/fridge/${props.fridgeID}`),
+      axios.get(`/fridge`),
+      axios.get(`/category`),
+    ]).then((res) => {
+      res[0].data.length === 0 ? setList([]) : setList(res[0].data);
+      const selectedFridge = res[1].data.filter(
+        (fridge: Fridge) => fridge.id === props.fridgeID
+      );
       setFridgeInfo({
-        fridge_id: res.data[0].fridge_id,
-        fridge_name: res.data[0].fridge_name,
-        location: res.data[0].location,
-        type: res.data[0].type,
+        fridge_id: selectedFridge[0].id,
+        fridge_name: selectedFridge[0].name,
+        location: selectedFridge[0].location,
+        type: selectedFridge[0].type,
       });
+      setCategory(res[2].data);
     });
   }, []);
   return (
-    <Grid sx={{ ml: 2 }}>
-      <Typography variant="h5" sx={{ mt: 2 }}>
-        <AcUnitIcon /> {fridgeInfo.fridge_name}
-      </Typography>
-      <Typography variant="h6" sx={{ mb: 2 }}>
-        {fridgeInfo.type} - {fridgeInfo.location}
-      </Typography>
-
-      <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-        <AddItem
-          setList={setList}
-          setEdit={setEdit}
-          setSelected={setSelected}
-        />
-        <Button
-          variant={edit === "open" ? "contained" : "outlined"}
-          startIcon={<EditIcon />}
-          onClick={() => {
-            setEdit(edit === "close" ? "open" : "close");
-            setSelected([]);
+    <Grid container>
+      {!category && (
+        <Box
+          sx={{
+            m: 2,
+            mt: 10,
+            display: "flex",
+            justifyContent: "center",
+            width: "72vw",
           }}
         >
-          EDIT
-        </Button>
-      </Stack>
+          <CircularProgress />
+        </Box>
+      )}
+      {category && (
+        <Grid sx={{ m: 2, width: "72vw" }}>
+          <Typography variant="h5" sx={{ mt: 2 }}>
+            <AcUnitIcon /> {fridgeInfo.fridge_name}
+          </Typography>
+          <Typography variant="h6" sx={{ mb: 2 }}>
+            {fridgeInfo.type} - {fridgeInfo.location}
+          </Typography>
 
-      <Category
-        selectedCategory={selectedCategory}
-        onClick={setSelectedCategory}
-      />
-      <ListTable
-        list={list}
-        edit={edit}
-        category={selectedCategory}
-        selected={selected}
-        setSelected={setSelected}
-        setList={setList}
-        setEdit={setEdit}
-      />
+          <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+            <AddItem
+              setList={setList}
+              setEdit={setEdit}
+              setSelected={setSelected}
+            />
+            <Button
+              variant={edit === "open" ? "contained" : "outlined"}
+              startIcon={<EditIcon />}
+              onClick={() => {
+                setEdit(edit === "close" ? "open" : "close");
+                setSelected([]);
+              }}
+            >
+              EDIT
+            </Button>
+          </Stack>
+
+          <Category
+            selectedCategory={selectedCategory}
+            onClick={setSelectedCategory}
+            category={category}
+          />
+          <ListTable
+            list={list}
+            edit={edit}
+            category={selectedCategory}
+            selected={selected}
+            setSelected={setSelected}
+            setList={setList}
+            setEdit={setEdit}
+          />
+        </Grid>
+      )}
     </Grid>
   );
 }

@@ -67,14 +67,23 @@ itemRouter.post("/:fridge_type/search/:item_name", (req, res) => {
     console.log("New item added!");
   });
 
-  client
-    .query(
-      `SELECT MAX(id) FROM "item"`
-    )
-    .then((result) => {
-      res.send({item_id: result.rows[0].max});
-    });
+  client.query(`SELECT MAX(id) FROM "item"`).then((result) => {
+    res.send({ item_id: result.rows[0].max });
+  });
+});
+
+itemRouter.put("/:fridge_type/search/:item_name", (req, res) => {
+  const text = `
+  update "item"
+  set freshDay=$1 
+  where name=$2
+`;
+  const value = [req.body.freshDay, req.params.item_name];
+
+  client.query(text, value).then(() => {
+    console.log("update the fresh days");
+    res.send("update the fresh days");
+  });
 });
 
 export default itemRouter;
-
