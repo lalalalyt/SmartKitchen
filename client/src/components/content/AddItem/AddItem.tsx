@@ -2,10 +2,11 @@ import { Button } from "@mui/material";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import axios from "axios";
 import { useContext, useState } from "react";
-import { FridgeContext } from "../../container/AppContainer";
+
 import { ItemList } from "../ItemList/ItemList";
 import { dateDifference } from "../../../helpers/dateDifference";
 import InfoDialog from "./InfoDialog";
+import { FridgeContext } from "../../../contexts/FridgeContext.tsx";
 
 export interface Inputs {
   itemCategory: string;

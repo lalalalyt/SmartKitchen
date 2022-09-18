@@ -6,11 +6,11 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Box, Grid, Typography } from "@mui/material";
+import { Grid } from "@mui/material";
 import axios from "axios";
-import { UserContext } from "../container/AppContainer";
-import { transform } from "typescript";
-import { ModeContext } from "../../App";
+import { ModeContext } from "../../contexts/ModeContext";
+import { UserContext } from "../../contexts/UserContext";
+
 
 interface User {
   name: string;

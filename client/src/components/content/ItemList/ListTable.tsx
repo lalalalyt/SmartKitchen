@@ -14,17 +14,17 @@ import {
 } from "@mui/material";
 import AddAlertIcon from "@mui/icons-material/AddAlert";
 import DeleteIcon from "@mui/icons-material/Delete";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import EditIcon from "@mui/icons-material/Edit";
+
 import { useContext, useState } from "react";
 import { dateDifference } from "../../../helpers/dateDifference";
 import { showDate } from "../../../helpers/showDate";
 import { showFresh } from "../../../helpers/showFresh";
 import { ItemList } from "./ItemList";
 import axios from "axios";
-import { FridgeContext } from "../../container/AppContainer";
+
 import { defaultInputs, Inputs } from "../AddItem/AddItem";
 import InfoDialog from "../AddItem/InfoDialog";
+import { FridgeContext } from "../../../contexts/FridgeContext.tsx";
 
 interface ListTableProps {
   list: null | Array<ItemList>;

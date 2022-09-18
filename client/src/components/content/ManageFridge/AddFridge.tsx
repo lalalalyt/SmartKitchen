@@ -14,7 +14,8 @@ import AddIcon from "@mui/icons-material/Add";
 import { useContext, useState } from "react";
 import axios from "axios";
 import { Fridge } from "./FridgeList";
-import { UserContext } from "../../container/AppContainer";
+import { UserContext } from "../../../contexts/UserContext";
+
 
 interface AddFridgeProps {
   setFridgeList: React.Dispatch<React.SetStateAction<[Fridge] | []>>;

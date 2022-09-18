@@ -1,7 +1,8 @@
 import { AppBar, Button, Toolbar, Typography } from "@mui/material";
-import Authentication from "../topNav/Authentication";
-import { ModeContext } from "../../App";
 import { useContext } from "react";
+import { ModeContext } from "../../contexts/ModeContext";
+import Authentication from "../topNav/Authentication";
+
 
 function TopNav() {
   const [, transite] = useContext(ModeContext);

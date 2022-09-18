@@ -2,9 +2,10 @@ import { Alert, Box, List, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import Fridge, { FridgeProps } from "./Fridge";
 import axios from "axios";
-import { FridgeContext } from "../../container/AppContainer";
-import { UserContext } from "../../container/AppContainer";
+
 import AddFridge from "./AddFridge";
+import { FridgeContext } from "../../../contexts/FridgeContext.tsx";
+import { UserContext } from "../../../contexts/UserContext";
 
 interface FridgeListProps {
   onClick: () => void;

@@ -13,9 +13,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import axios from "axios";
 import React, { useContext, useEffect, useState } from "react";
-import { FridgeContext } from "../../container/AppContainer";
+
 import { CategoryType } from "../ItemList/Category";
 import { Inputs } from "./AddItem";
+import { FridgeContext } from "../../../contexts/FridgeContext.tsx";
 
 interface ItemInputProps {
   inputs: Inputs;
