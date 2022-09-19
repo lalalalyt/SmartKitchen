@@ -50,6 +50,7 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
 
   const handleSave = () => {
     setAdd(false);
+    //
     if (!inputs.itemID && inputs.bestBefore && inputs.purchaseDate) {
       axios
         .post(`/item/${fridgeType}/search/${inputs.newItem}`, {

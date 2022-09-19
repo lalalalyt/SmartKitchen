@@ -1,6 +1,6 @@
 import { Alert, Box, List, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import Fridge, { FridgeProps } from "./Fridge";
+import Fridge from "./Fridge";
 import axios from "axios";
 
 import AddFridge from "./AddFridge";
