@@ -83,17 +83,21 @@ function ItemInput(props: ItemInputProps) {
     value: string | null
   ) => {
     setNewItem(value ?? "");
-    axios.get(`/item/${fridgeType}/search/${value}`).then((res) => {
-      props.setInputs((prev) => ({
-        ...prev,
-        itemID: res.data[0] ? res.data[0].id : null,
-        bestBefore: res.data[0]
-          ? new Date(
-              new Date().getTime() + res.data[0].freshday * 24 * 60 * 60 * 1000
-            )
-          : null,
-      }));
-    });
+
+    axios
+      .get(`/item/${fridgeType}/search/${value?.toLowerCase().trim()}`)
+      .then((res) => {
+        props.setInputs((prev) => ({
+          ...prev,
+          itemID: res.data[0] ? res.data[0].id : null,
+          bestBefore: res.data[0]
+            ? new Date(
+                new Date().getTime() +
+                  res.data[0].freshday * 24 * 60 * 60 * 1000
+              )
+            : null,
+        }));
+      });
   };
 
   const categoryMenu = allCategory?.map((category) => (
@@ -118,33 +122,29 @@ function ItemInput(props: ItemInputProps) {
           justifyContent: "space-evenly",
         }}
       >
-        {categoryMenu && (
-          <FormControl sx={{ width: 0.3, m: 1 }}>
-            <InputLabel>Category</InputLabel>
-            <Select
-              name="category"
-              value={itemCategory}
-              label="Category"
-              onChange={handleCategory}
-              defaultValue=""
-            >
-              {categoryMenu}
-            </Select>
-          </FormControl>
-        )}
+        <FormControl sx={{ width: 0.3, m: 1 }} required>
+          <InputLabel>Category</InputLabel>
+          <Select
+            name="category"
+            value={itemCategory}
+            label="Category"
+            onChange={handleCategory}
+            defaultValue=""
+          >
+            {categoryMenu}
+          </Select>
+        </FormControl>
+
         <Autocomplete
           filterOptions={(options, params) => {
             const filtered = filter(options, params);
-
             const { inputValue } = params;
+            const value = inputValue.toLowerCase().trim();
             // Suggest the creation of a new value
-            const isExisting = options.some(
-              (option) => inputValue === option.name
-            );
-            if (inputValue !== "" && !isExisting) {
-              filtered.push({ inputValue, name: `Add "${inputValue}"` });
+            const isExisting = options.some((option) => value === option.name);
+            if (value !== "" && !isExisting) {
+              filtered.push({ inputValue, name: `Add "${value.trim()}"` });
             }
-
             return filtered;
           }}
           freeSolo={true}
@@ -167,7 +167,9 @@ function ItemInput(props: ItemInputProps) {
           inputValue={newItem}
           onInputChange={handleItemName}
           renderOption={(props, option) => <li {...props}>{option.name}</li>}
-          renderInput={(params) => <TextField {...params} label="Name" />}
+          renderInput={(params) => (
+            <TextField {...params} required label="Name" />
+          )}
         />
         <TextField
           sx={{ width: 0.3, m: 1 }}
@@ -188,15 +190,16 @@ function ItemInput(props: ItemInputProps) {
             onChange={(newValue) => {
               setPurchaseDate(newValue);
             }}
-            renderInput={(params) => <TextField {...params} />}
+            renderInput={(params) => <TextField {...params} required />}
           />
           <DatePicker
             label="Best Before"
+            disablePast
             value={bestBefore}
             onChange={(newValue) => {
               setBestBefore(newValue);
             }}
-            renderInput={(params) => <TextField {...params} />}
+            renderInput={(params) => <TextField {...params} required />}
           />
         </LocalizationProvider>
       </Grid>

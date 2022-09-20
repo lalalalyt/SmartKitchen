@@ -6,7 +6,6 @@ const categoryRouter = express.Router();
 categoryRouter.get("/", (req, res) => {
   client.query('select * from "category"').then((result) => {
     res.send(result.rows);
-    console.log("All category successfully pulled!", result.rows);
   });
 });
 

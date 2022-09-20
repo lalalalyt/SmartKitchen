@@ -9,7 +9,6 @@ fridgeRouter.use(bodyParser.json());
 fridgeRouter.get("/", (req, res) => {
   client.query('select * from "fridge"').then((result) => {
     res.send(result.rows);
-    console.log("fridge list successfully pulled!", result.rows);
   });
 });
 
@@ -18,7 +17,6 @@ fridgeRouter.post("/", (req, res) => {
   VALUES (setval(pg_get_serial_sequence('fridge', 'id'), (SELECT MAX(id) FROM "fridge")+1), $1, $2, $3)`;
   const value = [req.body.type, req.body.name, req.body.user_id];
   client.query(text, value).then((result) => {
-    console.log("Add new fridge!");
     res.send("successfully added");
   });
 });
@@ -35,12 +33,10 @@ fridgeRouter.get("/:id", (req, res) => {
   const value = [req.params.id];
   client.query(text, value).then((result) => {
     res.send(result.rows);
-    console.log("item list successfully pulled!", result.rows);
   });
 });
 
 fridgeRouter.post("/:id", (req, res) => {
-  console.log("got body", req.body);
   const text = `INSERT INTO "list" (quantity, purchaseDate, bestBefore, item_id, fridge_id, id)
   VALUES ($1, $2, $3, $4, $5, setval(pg_get_serial_sequence('list', 'id'), (SELECT MAX(id) FROM "list")+1) );`;
 
@@ -52,17 +48,14 @@ fridgeRouter.post("/:id", (req, res) => {
     req.params.id,
   ];
   client.query(text, value).then((result) => {
-    console.log("new item successfully added into the fridge!", result.rows);
     res.send("success");
   });
 });
 
 fridgeRouter.delete("/:id", async (req, res) => {
-  console.log("got body", req.body.selected);
   await client
     .query(`create table "deleteArray"(name VARCHAR (255) UNIQUE NOT NULL)`)
     .then(() => {
-      console.log("Temp table is created.");
       req.body.selected.forEach((item: string) => {
         client.query(`insert into "deleteArray" (name) values($1)`, [item]);
       });
@@ -75,7 +68,6 @@ fridgeRouter.delete("/:id", async (req, res) => {
       (select * from "deleteArray")
   )`;
   client.query(text).then(() => {
-    console.log("Seleted items are successfully deleted!");
     client.query(`drop table "deleteArray" `);
   });
   res.send("sucessfully deleted");

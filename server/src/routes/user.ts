@@ -12,7 +12,6 @@ userRouter.use(bodyParser.json());
 userRouter.get("/", (req, res) => {
   client.query('select * from "user"').then((result) => {
     res.send(result.rows);
-    console.log("user successfully pulled!", result.rows);
   });
 });
 
@@ -21,7 +20,6 @@ userRouter.get("/:id", (req, res) => {
     .query(`select * from "fridge" where user_id=$1`, [req.params.id])
     .then((result) => {
       res.send(result.rows);
-      console.log("user's fridges successfully pulled'", result.rows);
     });
 });
 
@@ -31,7 +29,6 @@ userRouter.post("/", (req, res) => {
       getUserWithName(req.body.name),
       getUserWithEmail(req.body.email),
     ]).then((exist) => {
-      console.log({ exist });
       if (!exist[0] && !exist[1]) {
         const password = req.body.password;
         const hashedPassword = bcrypt.hashSync(password, 10);
@@ -45,7 +42,6 @@ userRouter.post("/", (req, res) => {
         ];
         client.query(text, value).then((result) => {
           res.send(result.rows);
-          console.log("successfully added the new user");
         });
       } else if (exist[0]) {
         //"name already exists"

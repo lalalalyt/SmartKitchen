@@ -11,7 +11,7 @@ itemRouter.get("/", (req, res) => {
   select * from "item"`;
   client.query(text).then((result) => {
     res.send(result.rows);
-    console.log("all items successfully pulled!", result.rows);
+    // console.log("all items successfully pulled!", result.rows);
   });
 });
 
@@ -21,10 +21,6 @@ itemRouter.get("/:fridge_type", (req, res) => {
   const value = [req.params.fridge_type];
   client.query(text, value).then((result) => {
     res.send(result.rows);
-    console.log(
-      "all items for this type of fridge successfully pulled!",
-      result.rows
-    );
   });
 });
 itemRouter.get("/:fridge_type/:category_name", (req, res) => {
@@ -35,7 +31,6 @@ itemRouter.get("/:fridge_type/:category_name", (req, res) => {
   const value = [req.params.fridge_type, req.params.category_name];
   client.query(text, value).then((result) => {
     res.send(result.rows);
-    console.log("item of this category successfully pulled!", result.rows);
   });
 });
 
@@ -46,42 +41,49 @@ itemRouter.get("/:fridge_type/search/:item_name", (req, res) => {
   const value = [req.params.fridge_type, req.params.item_name];
   client.query(text, value).then((result) => {
     res.send(result.rows);
-    console.log("This item successfully pulled!", result.rows);
   });
 });
 
 itemRouter.post("/:fridge_type/search/:item_name", (req, res) => {
-  const text = `
-  insert into "item" (category_id, name, place, freshDay, id )
-  select id, $2, $3, $4, setval(pg_get_serial_sequence('item', 'id'), (SELECT MAX(id) FROM "item")+1) from "category"
-  where name=$1;
-`;
-  const value = [
-    req.body.itemCategory,
-    req.body.name,
-    req.body.place,
-    req.body.freshDay,
-  ];
+  client
+    .query(`SELECT id FROM "item" WHERE name=$1`, [
+      req.body.name.toLowerCase().trim(),
+    ])
+    .then((result) => {
+      if (result.rows.length != 0) return res.status(400).end();
+      const insertNewItem = `
+      insert into "item" (category_id, name, place, freshDay, id )
+      select id, $2, $3, $4, setval(pg_get_serial_sequence('item', 'id'), (SELECT MAX(id) FROM "item")+1) from "category"
+      where name=$1;
+      `;
+      const value = [
+        req.body.itemCategory,
+        req.body.name,
+        req.body.place,
+        req.body.freshDay,
+      ];
 
-  client.query(text, value).then(() => {
-    console.log("New item added!");
-  });
-
-  client.query(`SELECT MAX(id) FROM "item"`).then((result) => {
-    res.send({ item_id: result.rows[0].max });
-  });
+      client.query(insertNewItem, value).then(() => {
+        client
+          .query(`SELECT id FROM "item" WHERE name=$1`, [
+            req.body.name.toLowerCase().trim(),
+          ])
+          .then((result) => {
+            res.send(result.rows[0]);
+          });
+      });
+    });
 });
 
 itemRouter.put("/:fridge_type/search/:item_name", (req, res) => {
-  const text = `
+  const updateFreshDay = `
   update "item"
   set freshDay=$1 
   where name=$2
 `;
-  const value = [req.body.freshDay, req.params.item_name];
+  const value = [req.body.freshDay, req.params.item_name.toLowerCase().trim()];
 
-  client.query(text, value).then(() => {
-    console.log("update the fresh days");
+  client.query(updateFreshDay, value).then(() => {
     res.send("update the fresh days");
   });
 });

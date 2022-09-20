@@ -16,7 +16,6 @@ export const getUserWithEmail = (email: string) => {
       [search]
     )
     .then((res) => {
-      console.log(res.rows);
       exist = res.rows.length > 0 ? true : false;
       return exist;
     });
@@ -31,7 +30,6 @@ export const getUserWithName = (name: string) => {
       [name]
     )
     .then((res) => {
-      console.log(res.rows);
       exist = res.rows.length > 0 ? true : false;
       return exist;
     });

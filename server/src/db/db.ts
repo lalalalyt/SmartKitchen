@@ -23,10 +23,6 @@ client
   .then((res) => console.log(res.rows[0]))
   .catch((err) => console.error(err.stack));
 
-//Add tables
-
-client.query(`
-
-`);
+//Add table
 
 export { client };

@@ -47,14 +47,19 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
     setAdd(false);
     setInputs(defaultInputs);
   };
-
-  const handleSave = () => {
+  const getListFromFridge = () => {
+    axios.get(`/fridge/${fridgeID}`).then((res) => {
+      res.data.length === 0 ? setList([]) : setList(res.data);
+    });
+  };
+  const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     setAdd(false);
     //
     if (!inputs.itemID && inputs.bestBefore && inputs.purchaseDate) {
       axios
         .post(`/item/${fridgeType}/search/${inputs.newItem}`, {
-          name: inputs.newItem,
+          name: inputs.newItem.toLowerCase().trim(),
           place: fridgeType,
           freshDay: dateDifference(
             inputs.bestBefore.toString(),
@@ -63,18 +68,17 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
           itemCategory: inputs.itemCategory,
         })
         .then((res) => {
-          setInputs((prev) => ({ ...prev, itemID: res.data.item_id }));
+          setInputs((prev) => ({ ...prev, itemID: res.data.id }));
           axios
             .post(`/fridge/${fridgeID}`, {
               ...inputs,
-              itemID: res.data.item_id,
+              itemID: res.data.id,
             })
             .then(() => {
-              axios.get(`/fridge/${fridgeID}`).then((res) => {
-                res.data.length === 0 ? setList([]) : setList(res.data);
-              });
+              getListFromFridge();
             });
-        });
+        })
+        .catch((err) => console.error(err));
     } else if (inputs.itemID && inputs.bestBefore && inputs.purchaseDate) {
       Promise.all([
         axios.put(`/item/${fridgeType}/search/${inputs.newItem}`, {
@@ -85,9 +89,7 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
         }),
         axios.post(`/fridge/${fridgeID}`, inputs),
       ]).then(() => {
-        axios.get(`/fridge/${fridgeID}`).then((res) => {
-          res.data.length === 0 ? setList([]) : setList(res.data);
-        });
+        getListFromFridge();
       });
     }
     setInputs(defaultInputs);
