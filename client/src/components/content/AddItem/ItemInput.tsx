@@ -149,7 +149,8 @@ function ItemInput(props: ItemInputProps) {
           }}
           freeSolo={true}
           selectOnFocus
-          sx={{ width: 0.3, m: 1 }}
+          sx={{ width: 0.3, m: 1}}
+          ListboxProps={{ style: {maxHeight: 120} }}
           disablePortal
           options={itemOption}
           getOptionLabel={(option) => {
