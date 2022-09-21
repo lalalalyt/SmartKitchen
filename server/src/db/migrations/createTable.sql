@@ -47,8 +47,8 @@ CREATE TABLE
     if NOT EXISTS "list" (
         id serial PRIMARY key NOT NULL,
         quantity INTEGER,
-        purchaseDate DATE,
-        bestBefore DATE,
+        purchaseDate timestamp with time zone,
+        bestBefore timestamp with time zone,
         item_id INTEGER REFERENCES "item"(id)
         ON DELETE cascade,
         fridge_id INTEGER REFERENCES "fridge"(id)

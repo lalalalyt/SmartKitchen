@@ -55,7 +55,7 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
   const handleSave = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setAdd(false);
-    //
+    // If this item has never been added before, send a post request
     if (!inputs.itemID && inputs.bestBefore && inputs.purchaseDate) {
       axios
         .post(`/item/${fridgeType}/search/${inputs.newItem}`, {
@@ -79,6 +79,7 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
             });
         })
         .catch((err) => console.error(err));
+    // If this item has already been added, send a put request to update the freshday 
     } else if (inputs.itemID && inputs.bestBefore && inputs.purchaseDate) {
       Promise.all([
         axios.put(`/item/${fridgeType}/search/${inputs.newItem}`, {

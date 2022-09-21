@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import AddAlertIcon from "@mui/icons-material/AddAlert";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
 
 import { useContext, useState } from "react";
 import { dateDifference } from "../../../helpers/dateDifference";
@@ -228,6 +229,13 @@ function ListTable(props: ListTableProps) {
                             </IconButton>
                           )}
                         </TableCell>
+                        <TableCell align="center">
+                          {isItemSelected && (
+                            <IconButton onClick={handleChangeOpen}>
+                              <EditIcon />
+                            </IconButton>
+                          )}
+                        </TableCell>
                       </TableRow>
                     );
                   }
@@ -251,7 +259,7 @@ function ListTable(props: ListTableProps) {
                 startIcon={<ShoppingCartIcon />}
               >
                 Delete & Add into shopping list
-              </Button>
+              </Button>*/}
               <Button
                 onClick={handleChangeOpen}
                 sx={{ m: 2 }}
@@ -259,7 +267,7 @@ function ListTable(props: ListTableProps) {
                 startIcon={<EditIcon />}
               >
                 Change the info of item
-              </Button> */}
+              </Button> 
             </Grid>
           )}
           <InfoDialog

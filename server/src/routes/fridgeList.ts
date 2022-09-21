@@ -32,6 +32,7 @@ fridgeRouter.get("/:id", (req, res) => {
     where fridge_id= $1`;
   const value = [req.params.id];
   client.query(text, value).then((result) => {
+    console.log(result.rows)
     res.send(result.rows);
   });
 });
@@ -47,6 +48,7 @@ fridgeRouter.post("/:id", (req, res) => {
     req.body.itemID,
     req.params.id,
   ];
+  console.log({ value });
   client.query(text, value).then((result) => {
     res.send("success");
   });
