@@ -6,11 +6,12 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Grid } from "@mui/material";
+import { Alert, Grid, Snackbar } from "@mui/material";
 import axios from "axios";
 import { ModeContext } from "../../contexts/ModeContext";
 import { UserContext } from "../../contexts/UserContext";
-
+import ToastLogin from "./Toast/ToastLogin";
+import ToastSignout from "./Toast/ToastSignout";
 
 interface User {
   name: string;
@@ -26,10 +27,21 @@ export interface DBUser {
   password: string;
 }
 
-function Authentication() {
+type Props = {
+  toastSignout: boolean;
+  setToastSignout: React.Dispatch<React.SetStateAction<boolean>>;
+  logoutAction: () => void;
+};
+
+function Authentication({
+  toastSignout,
+  setToastSignout,
+  logoutAction,
+}: Props) {
   const [mode, transite] = useContext(ModeContext);
   const { user, setUser } = useContext(UserContext);
   const [open, setOpen] = useState(false);
+  const [toastLogin, setToastLogin] = useState(false);
   const [error, setError] = useState({
     confirm: false,
     existingName: false,
@@ -77,10 +89,12 @@ function Authentication() {
     });
   };
 
-  const handleCloseSignOut = () => {
-    setUserMode("Login");
-    setOpen(false);
-  };
+  useEffect(() => {
+    if (!user.name) {
+      setUserMode("Login");
+    }
+  }, [user]);
+
   const handleSubmitLogin = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     axios
@@ -100,6 +114,7 @@ function Authentication() {
         });
         setOpen(false);
         setUserMode("Manage");
+        setToastLogin(true);
       })
       .catch((err) => {
         if (err.response.data === "cannot find this account") {
@@ -165,12 +180,13 @@ function Authentication() {
     localStorage.setItem("user", JSON.stringify(user));
   }, [user]);
 
+  console.log({ authUser: user });
   return (
     <>
       <Button
         color="inherit"
         onClick={handleClickOpen}
-        sx={{ textTransform: "none" }}
+        sx={{ textTransform: "none", fontSize: 25 }}
       >
         {user.name ? user.name : "Login"}
       </Button>
@@ -229,6 +245,10 @@ function Authentication() {
           </form>
         </Dialog>
       )}
+      {toastLogin && (
+        <ToastLogin toastLogin={toastLogin} setToastLogin={setToastLogin} />
+      )}
+
       {userMode === "Create" && (
         <Dialog open={open} onClose={handleClose}>
           <form onSubmit={handleSubmitCreate}>
@@ -304,7 +324,7 @@ function Authentication() {
                     error={error.confirm}
                     margin="normal"
                     sx={{ mr: 2 }}
-                    label="Confirm"
+                    label="Confirm your password"
                     type="password"
                     variant="standard"
                     value={state.confirm}
@@ -365,9 +385,10 @@ function Authentication() {
             </Button>
             <Button
               onClick={() => {
-                setUserMode("SignOut");
-                setUser({ id: 0, name: "", email: "" });
+                setOpen(false);
+                setUserMode("Login");
                 transite("HOME");
+                logoutAction();
               }}
               autoFocus
             >
@@ -376,25 +397,11 @@ function Authentication() {
           </DialogActions>
         </Dialog>
       )}
-      {userMode === "SignOut" && (
-        <Dialog open={open} onClose={handleCloseSignOut}>
-          <DialogTitle>SmartKitchen - Signed Out</DialogTitle>
-          <DialogContent>
-            <DialogContentText
-              sx={{ display: "flex", justifyContent: "center" }}
-            >
-              {user.name} {user.email}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions
-            sx={{ display: "flex", justifyContent: "space-evenly" }}
-          >
-            <Button onClick={handleCloseSignOut}>Close</Button>
-            <Button onClick={() => setUserMode("Login")} autoFocus>
-              Sign In Again
-            </Button>
-          </DialogActions>
-        </Dialog>
+      {toastSignout && (
+        <ToastSignout
+          toastSignout={toastSignout}
+          setToastSignout={setToastSignout}
+        />
       )}
     </>
   );

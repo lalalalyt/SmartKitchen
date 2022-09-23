@@ -1,4 +1,4 @@
-import { Alert, Box, List, Typography } from "@mui/material";
+import { Alert, Box, Button, List, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 import Fridge from "./Fridge";
 import axios from "axios";
@@ -57,8 +57,8 @@ function FridgeList(props: FridgeListProps) {
             m: 3,
             ml: 10,
             boxShadow: 1,
-
-            height: 30,
+            fontSize: 18,
+            height: 45,
             width: 498,
           }}
           severity="error"

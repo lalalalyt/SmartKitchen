@@ -11,14 +11,14 @@ export interface User {
 }
 function AppContainer() {
   return (
-    <Grid container>
-      <UserContextProvider>
+    <UserContextProvider>
+      <Grid container>
         <TopNav />
         <FridgeContextProvider>
           <MainContainer />
         </FridgeContextProvider>
-      </UserContextProvider>
-    </Grid>
+      </Grid>
+    </UserContextProvider>
   );
 }
 

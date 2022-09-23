@@ -4,7 +4,7 @@ import ModeContextProvider from "./contexts/ModeContext/provider";
 function App() {
   return (
     <ModeContextProvider>
-      <AppContainer />
+        <AppContainer />
     </ModeContextProvider>
   );
 }
