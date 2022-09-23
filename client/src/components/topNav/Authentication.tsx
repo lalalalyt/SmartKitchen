@@ -10,8 +10,7 @@ import { Alert, Grid, Snackbar } from "@mui/material";
 import axios from "axios";
 import { ModeContext } from "../../contexts/ModeContext";
 import { UserContext } from "../../contexts/UserContext";
-import ToastLogin from "./Toast/ToastLogin";
-import ToastSignout from "./Toast/ToastSignout";
+import Toast from "./Toast";
 
 interface User {
   name: string;
@@ -246,7 +245,11 @@ function Authentication({
         </Dialog>
       )}
       {toastLogin && (
-        <ToastLogin toastLogin={toastLogin} setToastLogin={setToastLogin} />
+        <Toast
+          message={"You have successfully logged in!"}
+          open={toastLogin}
+          setOpen={setToastLogin}
+        />
       )}
 
       {userMode === "Create" && (
@@ -398,9 +401,10 @@ function Authentication({
         </Dialog>
       )}
       {toastSignout && (
-        <ToastSignout
-          toastSignout={toastSignout}
-          setToastSignout={setToastSignout}
+        <Toast
+          message={"You have successfully signed out!"}
+          open={toastSignout}
+          setOpen={setToastSignout}
         />
       )}
     </>
