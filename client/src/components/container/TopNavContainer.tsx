@@ -1,7 +1,7 @@
 import { AppBar, Button, Toolbar, Typography } from "@mui/material";
 import { useContext } from "react";
 import { ModeContext } from "../../contexts/ModeContext";
-import AutoLogout from "../topNav/AutoLogout";
+import Authentication from "../topNav/Authentication";
 
 function TopNav() {
   const [, transite] = useContext(ModeContext);
@@ -14,7 +14,7 @@ function TopNav() {
             SmartKitchen
           </Typography>
         </Button>
-        <AutoLogout/>
+        <Authentication />
       </Toolbar>
     </AppBar>
   );

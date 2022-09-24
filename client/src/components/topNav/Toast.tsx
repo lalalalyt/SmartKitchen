@@ -8,7 +8,7 @@ const ToastLogin = ({ open, setOpen, message }: Props) => {
   return (
     <Snackbar
       open={open}
-      autoHideDuration={2000}
+      autoHideDuration={5000}
       onClose={() => setOpen(false)}
       anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
     >

@@ -26,21 +26,12 @@ export interface DBUser {
   password: string;
 }
 
-type Props = {
-  toastSignout: boolean;
-  setToastSignout: React.Dispatch<React.SetStateAction<boolean>>;
-  logoutAction: () => void;
-};
-
-function Authentication({
-  toastSignout,
-  setToastSignout,
-  logoutAction,
-}: Props) {
+function Authentication() {
   const [mode, transite] = useContext(ModeContext);
   const { user, setUser } = useContext(UserContext);
   const [open, setOpen] = useState(false);
   const [toastLogin, setToastLogin] = useState(false);
+  const [toastLogout, setToastLogout] = useState(false);
   const [error, setError] = useState({
     confirm: false,
     existingName: false,
@@ -161,6 +152,14 @@ function Authentication({
     }
   };
 
+  const handleLogOut = () => {
+    setOpen(false);
+    setUserMode("Login");
+    transite("HOME");
+    setUser({ id: 0, name: "", email: "" });
+    setToastLogout(true);
+  };
+
   const errorMessage = () => {
     if (error.existingName) {
       return "Name already exists!";
@@ -179,7 +178,6 @@ function Authentication({
     localStorage.setItem("user", JSON.stringify(user));
   }, [user]);
 
-  console.log({ authUser: user });
   return (
     <>
       <Button
@@ -386,25 +384,17 @@ function Authentication({
             >
               Close
             </Button>
-            <Button
-              onClick={() => {
-                setOpen(false);
-                setUserMode("Login");
-                transite("HOME");
-                logoutAction();
-              }}
-              autoFocus
-            >
+            <Button onClick={handleLogOut} autoFocus>
               Sign Out
             </Button>
           </DialogActions>
         </Dialog>
       )}
-      {toastSignout && (
+      {toastLogout && (
         <Toast
-          message={"You have successfully signed out!"}
-          open={toastSignout}
-          setOpen={setToastSignout}
+          message={"You have successfully logged out!"}
+          open={toastLogout}
+          setOpen={setToastLogout}
         />
       )}
     </>
