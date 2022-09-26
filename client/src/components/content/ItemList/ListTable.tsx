@@ -15,6 +15,7 @@ import {
 import AddAlertIcon from "@mui/icons-material/AddAlert";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 
 import { useContext, useState } from "react";
 import { dateDifference } from "../../../helpers/dateDifference";
@@ -29,12 +30,12 @@ import { FridgeContext } from "../../../contexts/FridgeContext.tsx";
 
 interface ListTableProps {
   list: null | Array<ItemList>;
-  edit: string;
+  edit: boolean;
   category: null | number;
   selected: Array<string>;
   setSelected: React.Dispatch<React.SetStateAction<string[]>>;
   setList: React.Dispatch<React.SetStateAction<ItemList[] | null>>;
-  setEdit: React.Dispatch<React.SetStateAction<string>>;
+  setEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function ListTable(props: ListTableProps) {
@@ -123,6 +124,43 @@ function ListTable(props: ListTableProps) {
     setInputs(defaultInputs);
   };
 
+  const columns: GridColDef[] = [
+    { field: "id", headerName: "ID", width: 70 },
+    { field: "name", headerName: "Name", width: 120 },
+    {
+      field: "quantity",
+      headerName: "Quantity",
+      type: "number",
+      width: 80,
+    },
+    { field: "purchaseDate", headerName: "Purchase Date", width: 200 },
+    { field: "bestBefore", headerName: "Best Before", width: 200 },
+    {
+      field: "remaining days",
+      headerName: "Remaining Days",
+      sortable: false,
+      width: 160,
+    },
+    {
+      field: "fresh",
+      headerName: "Fresh",
+      sortable: false,
+      width: 160,
+    }
+  ];
+
+  const rows = list
+    ? list.map((item) => {
+        return {
+          id: item.id,
+          name: item.item_name,
+          quantity: item.quantity,
+          purchaseDate: item.purchasedate,
+          bestBefore: item.bestbefore,
+        };
+      })
+    : [];
+
   return (
     <Grid>
       {list?.length === 0 && (
@@ -130,11 +168,21 @@ function ListTable(props: ListTableProps) {
       )}
       {list && list.length !== 0 && (
         <>
-          <TableContainer sx={{ width: 900 }}>
+          <div style={{ height: 400, width: 1000 }}>
+            <DataGrid
+              rows={rows}
+              columns={columns}
+              pageSize={5}
+              rowsPerPageOptions={[5]}
+              checkboxSelection={edit}
+            />
+          </div>
+
+          <TableContainer>
             <Table aria-label="simple table">
               <TableHead>
                 <TableRow sx={{ height: 80 }}>
-                  {edit === "open" && (
+                  {edit === true && (
                     <TableCell padding="checkbox">
                       <Checkbox
                         color="primary"
@@ -182,7 +230,7 @@ function ListTable(props: ListTableProps) {
                           "&:last-child td, &:last-child th": { border: 0 },
                         }}
                       >
-                        {edit === "open" && (
+                        {edit === true && (
                           <TableCell padding="checkbox">
                             <Checkbox
                               color="primary"
@@ -243,7 +291,7 @@ function ListTable(props: ListTableProps) {
               </TableBody>
             </Table>
           </TableContainer>
-          {edit === "open" && selected.length !== 0 && (
+          {edit === true && selected.length !== 0 && (
             <Grid>
               <Button
                 onClick={handleDelete}
@@ -267,7 +315,7 @@ function ListTable(props: ListTableProps) {
                 startIcon={<EditIcon />}
               >
                 Change the info of item
-              </Button> 
+              </Button>
             </Grid>
           )}
           <InfoDialog

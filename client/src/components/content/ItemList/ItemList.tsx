@@ -44,7 +44,7 @@ interface ItemListProps {
 }
 
 function ItemList(props: ItemListProps) {
-  const [edit, setEdit] = useState<string>("close");
+  const [edit, setEdit] = useState<boolean>(false);
   const [selected, setSelected] = useState<Array<string>>([]);
   const [selectedCategory, setSelectedCategory] = useState<null | number>(null);
   const [list, setList] = useState<null | Array<ItemList>>(null);
@@ -76,7 +76,7 @@ function ItemList(props: ItemListProps) {
     });
   }, []);
   return (
-    <Grid container>
+    <Grid container display="flex" justifyContent="center">
       {!category && (
         <Box
           sx={{
@@ -84,14 +84,18 @@ function ItemList(props: ItemListProps) {
             mt: 10,
             display: "flex",
             justifyContent: "center",
-            width: "72vw",
           }}
         >
           <CircularProgress />
         </Box>
       )}
       {category && (
-        <Grid sx={{ m: 2, width: "72vw" }}>
+        <Grid
+          display="flex"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+        >
           <Typography variant="h5" sx={{ mt: 2 }}>
             <AcUnitIcon /> {fridgeInfo.fridge_name}
           </Typography>
@@ -106,10 +110,10 @@ function ItemList(props: ItemListProps) {
               setSelected={setSelected}
             />
             <Button
-              variant={edit === "open" ? "contained" : "outlined"}
+              variant={edit === true ? "contained" : "outlined"}
               startIcon={<EditIcon />}
               onClick={() => {
-                setEdit(edit === "close" ? "open" : "close");
+                setEdit(edit === false ? true : false);
                 setSelected([]);
               }}
             >

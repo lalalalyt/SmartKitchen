@@ -28,7 +28,7 @@ export const defaultInputs: Inputs = {
 
 interface AddItemProps {
   setList: React.Dispatch<React.SetStateAction<ItemList[] | null>>;
-  setEdit: React.Dispatch<React.SetStateAction<string>>;
+  setEdit: React.Dispatch<React.SetStateAction<boolean>>;
   setSelected: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
@@ -39,7 +39,7 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
 
   const handleClickOpen = () => {
     setAdd(true);
-    setEdit("close");
+    setEdit(false);
     setSelected([]);
   };
 
@@ -79,7 +79,7 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
             });
         })
         .catch((err) => console.error(err));
-    // If this item has already been added, send a put request to update the freshday 
+      // If this item has already been added, send a put request to update the freshday
     } else if (inputs.itemID && inputs.bestBefore && inputs.purchaseDate) {
       Promise.all([
         axios.put(`/item/${fridgeType}/search/${inputs.newItem}`, {

@@ -10,7 +10,7 @@ function MainContainer() {
   const [mode, transit] = useContext(ModeContext);
   const { fridgeID } = useContext(FridgeContext);
   return (
-    <Grid>
+    <Grid container sx={{ width: "100%" }}>
       {mode === "HOME" && (
         <FridgeList
           onClick={() => {

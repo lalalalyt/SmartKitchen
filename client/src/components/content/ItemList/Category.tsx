@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 
 export type CategoryType = {
   id: number;
@@ -17,7 +17,7 @@ function Category(props: CategoryProps) {
       variant={
         eachType.id === props.selectedCategory ? "contained" : "outlined"
       }
-      sx={{ m: 1, width: 100 }}
+      sx={{ m: 2, width: 100 }}
       key={eachType.id}
       onClick={() => props.onClick(eachType.id)}
     >
@@ -25,17 +25,17 @@ function Category(props: CategoryProps) {
     </Button>
   ));
   return (
-    <>
+    <Grid container display="flex" justifyContent="center" alignItems="center">
       {categoryButton}
       <Button
         variant={props.selectedCategory ? "outlined" : "contained"}
-        sx={{ m: 1, width: 100 }}
+        sx={{ m: 2, width: 100 }}
         key={-1}
         onClick={() => props.onClick(null)}
       >
         ALL
       </Button>
-    </>
+    </Grid>
   );
 }
 
