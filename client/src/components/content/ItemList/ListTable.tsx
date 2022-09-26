@@ -1,21 +1,7 @@
-import {
-  Table,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Typography,
-  Grid,
-  Checkbox,
-  Rating,
-  Button,
-  IconButton,
-} from "@mui/material";
-import AddAlertIcon from "@mui/icons-material/AddAlert";
+import { Typography, Grid, Button } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import { DataGrid, GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridSelectionModel } from "@mui/x-data-grid";
 
 import { useContext, useState } from "react";
 import { dateDifference } from "../../../helpers/dateDifference";
@@ -32,8 +18,8 @@ interface ListTableProps {
   list: null | Array<ItemList>;
   edit: boolean;
   category: null | number;
-  selected: Array<string>;
-  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
+  selected: GridSelectionModel;
+  setSelected: React.Dispatch<React.SetStateAction<GridSelectionModel>>;
   setList: React.Dispatch<React.SetStateAction<ItemList[] | null>>;
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
@@ -45,48 +31,12 @@ function ListTable(props: ListTableProps) {
   const [change, setChange] = useState(false);
   const [inputs, setInputs] = useState<Inputs>(defaultInputs);
 
-  const handleClick = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    name: string
-  ) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected: string[] = [];
-
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
-
-  const handleAllSelect = () => {
-    if (selected.length === list?.length) {
-      setSelected([]);
-    } else {
-      let newSelected: string[] = [];
-      list?.forEach((item) => {
-        newSelected = [...newSelected, item.item_name];
-      });
-      setSelected(newSelected);
-    }
-  };
-  const isSelected = (name: string) => selected.indexOf(name) !== -1;
-  const isAllSelected = () => selected.length === list?.length;
-
   const handleDelete = () => {
     axios.delete(`fridge/:${fridgeID}`, { data: { selected } }).then(() => {
       setList((prev) => {
         if (prev) {
           const newList = prev?.filter(
-            (item) => selected.indexOf(item.item_name) === -1
+            (item) => selected.indexOf(item.id) === -1
           );
           return newList;
         }
@@ -95,13 +45,11 @@ function ListTable(props: ListTableProps) {
     });
   };
 
-  const handleChangeOpen = () => {
+  const handleChange = () => {
     setChange(true);
     if (list) {
       setInputs(() => {
-        const changeItem = list.filter(
-          (item) => item.item_name === selected[0]
-        );
+        const changeItem = list.filter((item) => item.id === selected[0]);
         return {
           itemCategory: changeItem[0].category_name,
           newItem: changeItem[0].item_name,
@@ -125,174 +73,96 @@ function ListTable(props: ListTableProps) {
   };
 
   const columns: GridColDef[] = [
-    { field: "id", headerName: "ID", width: 70 },
-    { field: "name", headerName: "Name", width: 120 },
+    {
+      field: "name",
+      headerName: "Name",
+      width: 100,
+      headerAlign: "center",
+      align: "center",
+    },
     {
       field: "quantity",
       headerName: "Quantity",
       type: "number",
-      width: 80,
+      width: 100,
+      headerAlign: "center",
+      align: "center",
     },
-    { field: "purchaseDate", headerName: "Purchase Date", width: 200 },
-    { field: "bestBefore", headerName: "Best Before", width: 200 },
     {
-      field: "remaining days",
+      field: "purchaseDate",
+      headerName: "Purchase Date",
+      width: 180,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "bestBefore",
+      headerName: "Best Before",
+      width: 180,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "remaining",
       headerName: "Remaining Days",
-      sortable: false,
-      width: 160,
+      sortable: true,
+      width: 100,
+      headerAlign: "center",
+      align: "center",
     },
     {
       field: "fresh",
       headerName: "Fresh",
-      sortable: false,
-      width: 160,
-    }
+      sortable: true,
+      width: 140,
+      headerAlign: "center",
+      align: "center",
+    },
   ];
-
-  const rows = list
-    ? list.map((item) => {
-        return {
-          id: item.id,
-          name: item.item_name,
-          quantity: item.quantity,
-          purchaseDate: item.purchasedate,
-          bestBefore: item.bestbefore,
-        };
-      })
+  const itemInSelectedCategory = list?.filter(
+    (item) => !category || category === item.category_id
+  );
+  const rows = itemInSelectedCategory
+    ? itemInSelectedCategory
+        .map((item) => {
+          return {
+            id: item.id,
+            name: item.item_name,
+            quantity: item.quantity,
+            purchaseDate: showDate(item.purchasedate),
+            bestBefore: showDate(item.bestbefore),
+            remaining: dateDifference(item.bestbefore),
+            fresh: showFresh(item.purchasedate, item.bestbefore),
+          };
+        })
+        .sort((a, b) => a.fresh.length - b.fresh.length)
     : [];
 
   return (
-    <Grid>
+    <Grid container sx={{ width: "80%" }}>
       {list?.length === 0 && (
         <Typography>Your fridge is empty! Start to add items now!</Typography>
       )}
       {list && list.length !== 0 && (
         <>
-          <div style={{ height: 400, width: 1000 }}>
+          <div style={{ height: 400, width: "100%" }}>
             <DataGrid
               rows={rows}
               columns={columns}
               pageSize={5}
               rowsPerPageOptions={[5]}
               checkboxSelection={edit}
+              onSelectionModelChange={(selectionModel) => {
+                setSelected(selectionModel);
+              }}
+              selectionModel={selected}
             />
           </div>
 
-          <TableContainer>
-            <Table aria-label="simple table">
-              <TableHead>
-                <TableRow sx={{ height: 80 }}>
-                  {edit === true && (
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        color="primary"
-                        checked={isAllSelected()}
-                        onChange={handleAllSelect}
-                        inputProps={{
-                          "aria-label": "select all foods",
-                        }}
-                      />
-                    </TableCell>
-                  )}
-                  <TableCell width="6%" align="center">
-                    id
-                  </TableCell>
-                  <TableCell width="11%" align="center">
-                    name
-                  </TableCell>
-                  <TableCell width="11%" align="center">
-                    quantity
-                  </TableCell>
-                  <TableCell width="14%" align="center">
-                    purchase date
-                  </TableCell>
-                  <TableCell width="14%" align="center">
-                    best before
-                  </TableCell>
-                  <TableCell width="14%" align="center">
-                    remaining days
-                  </TableCell>
-                  <TableCell width="20%" align="center">
-                    fresh
-                  </TableCell>
-                  <TableCell width="10%" align="center"></TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {list.map((item) => {
-                  if (!category || category === item.category_id) {
-                    const isItemSelected = isSelected(item.item_name);
-                    return (
-                      <TableRow
-                        key={list.indexOf(item) + 1}
-                        sx={{
-                          height: 80,
-                          "&:last-child td, &:last-child th": { border: 0 },
-                        }}
-                      >
-                        {edit === true && (
-                          <TableCell padding="checkbox">
-                            <Checkbox
-                              color="primary"
-                              checked={isItemSelected}
-                              onChange={(event) =>
-                                handleClick(event, item.item_name)
-                              }
-                            />
-                          </TableCell>
-                        )}
-                        <TableCell align="center" component="th" scope="row">
-                          {list.indexOf(item) + 1}
-                        </TableCell>
-                        <TableCell align="center">{item.item_name}</TableCell>
-                        <TableCell align="center">{item.quantity}</TableCell>
-                        <TableCell align="center">
-                          {showDate(item.purchasedate)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {showDate(item.bestbefore)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {dateDifference(item.bestbefore)}
-                        </TableCell>
-                        <TableCell align="center">
-                          {showFresh(item.purchasedate, item.bestbefore) ===
-                            0 && <AddAlertIcon />}
-                          {showFresh(item.purchasedate, item.bestbefore) >
-                            0 && (
-                            <Rating
-                              name="read-only"
-                              value={showFresh(
-                                item.purchasedate,
-                                item.bestbefore
-                              )}
-                              readOnly
-                            />
-                          )}
-                        </TableCell>
-                        <TableCell align="center">
-                          {isItemSelected && (
-                            <IconButton onClick={handleDelete}>
-                              <DeleteIcon />
-                            </IconButton>
-                          )}
-                        </TableCell>
-                        <TableCell align="center">
-                          {isItemSelected && (
-                            <IconButton onClick={handleChangeOpen}>
-                              <EditIcon />
-                            </IconButton>
-                          )}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  }
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
           {edit === true && selected.length !== 0 && (
-            <Grid>
+            <Grid
+              sx={{ width: "100%", display: "flex", justifyContent: "center" }}
+            >
               <Button
                 onClick={handleDelete}
                 sx={{ m: 2 }}
@@ -309,7 +179,7 @@ function ListTable(props: ListTableProps) {
                 Delete & Add into shopping list
               </Button>*/}
               <Button
-                onClick={handleChangeOpen}
+                onClick={handleChange}
                 sx={{ m: 2 }}
                 variant={"outlined"}
                 startIcon={<EditIcon />}

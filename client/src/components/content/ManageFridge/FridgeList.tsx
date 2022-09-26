@@ -25,14 +25,18 @@ function FridgeList(props: FridgeListProps) {
   const [fridgeList, setFridgeList] = useState<[Fridge] | []>([]);
   const [error, setError] = useState(false);
   const list = fridgeList?.map((fridge) => (
-    <Grid display="flex" justifyContent="center" alignItems="center">
+    <Grid
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      key={fridge.id}
+    >
       <Fridge
         onClick={() => {
           props.onClick();
           setFridgeID(fridge.id);
           setFridgeType(fridge.type);
         }}
-        key={fridge.id}
         id={fridge.id}
         name={fridge.name}
         type={fridge.type as "R" | "F"}

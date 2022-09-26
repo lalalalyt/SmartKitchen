@@ -32,7 +32,7 @@ fridgeRouter.get("/:id", (req, res) => {
     where fridge_id= $1`;
   const value = [req.params.id];
   client.query(text, value).then((result) => {
-    console.log(result.rows)
+    console.log(result.rows);
     res.send(result.rows);
   });
 });
@@ -55,18 +55,18 @@ fridgeRouter.post("/:id", (req, res) => {
 });
 
 fridgeRouter.delete("/:id", async (req, res) => {
+  await client.query(`drop table if exists "deleteArray" `);
   await client
-    .query(`create table "deleteArray"(name VARCHAR (255) UNIQUE NOT NULL)`)
+    .query(`create table "deleteArray"(id serial PRIMARY key NOT NULL)`)
     .then(() => {
-      req.body.selected.forEach((item: string) => {
-        client.query(`insert into "deleteArray" (name) values($1)`, [item]);
+      req.body.selected.forEach((item: number) => {
+        client.query(`insert into "deleteArray" (id) values($1)`, [item]);
       });
     });
 
   const text = `
   delete from "list"
-  where item_id IN (
-    select item.id from "item" where name IN 
+  where id IN ( 
       (select * from "deleteArray")
   )`;
   client.query(text).then(() => {

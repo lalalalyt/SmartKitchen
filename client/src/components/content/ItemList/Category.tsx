@@ -17,7 +17,7 @@ function Category(props: CategoryProps) {
       variant={
         eachType.id === props.selectedCategory ? "contained" : "outlined"
       }
-      sx={{ m: 2, width: 100 }}
+      sx={{ m: 1.2, width: 100 }}
       key={eachType.id}
       onClick={() => props.onClick(eachType.id)}
     >
@@ -25,11 +25,18 @@ function Category(props: CategoryProps) {
     </Button>
   ));
   return (
-    <Grid container display="flex" justifyContent="center" alignItems="center">
+    <Grid
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        width: "15%",
+        mt: "5%",
+      }}
+    >
       {categoryButton}
       <Button
         variant={props.selectedCategory ? "outlined" : "contained"}
-        sx={{ m: 2, width: 100 }}
+        sx={{ m: 1.2, width: 100 }}
         key={-1}
         onClick={() => props.onClick(null)}
       >

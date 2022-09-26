@@ -15,6 +15,7 @@ import AddItem from "../AddItem/AddItem";
 import ListTable from "./ListTable";
 import Category, { CategoryType } from "./Category";
 import { Fridge } from "../ManageFridge/FridgeList";
+import { GridSelectionModel } from "@mui/x-data-grid";
 
 export type ItemList = {
   id: number;
@@ -45,7 +46,7 @@ interface ItemListProps {
 
 function ItemList(props: ItemListProps) {
   const [edit, setEdit] = useState<boolean>(false);
-  const [selected, setSelected] = useState<Array<string>>([]);
+  const [selected, setSelected] = useState<GridSelectionModel>([]);
   const [selectedCategory, setSelectedCategory] = useState<null | number>(null);
   const [list, setList] = useState<null | Array<ItemList>>(null);
   const [category, setCategory] = useState<null | Array<CategoryType>>(null);
@@ -76,7 +77,12 @@ function ItemList(props: ItemListProps) {
     });
   }, []);
   return (
-    <Grid container display="flex" justifyContent="center">
+    <Grid
+      container
+      display="flex"
+      flexDirection="column"
+      justifyContent="center"
+    >
       {!category && (
         <Box
           sx={{
@@ -90,52 +96,64 @@ function ItemList(props: ItemListProps) {
         </Box>
       )}
       {category && (
-        <Grid
-          display="flex"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Typography variant="h5" sx={{ mt: 2 }}>
-            <AcUnitIcon /> {fridgeInfo.fridge_name}
-          </Typography>
-          <Typography variant="h6" sx={{ mb: 2 }}>
-            {fridgeInfo.type} - {fridgeInfo.location}
-          </Typography>
+        <>
+          <Grid
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: "40%",
+              ml: "17.5%",
+            }}
+          >
+            <Typography variant="h5" sx={{ mt: 2 }}>
+              <AcUnitIcon /> {fridgeInfo.fridge_name}
+            </Typography>
+            <Typography variant="h6" sx={{ mb: 2 }}>
+              {fridgeInfo.type} - {fridgeInfo.location}
+            </Typography>
 
-          <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
-            <AddItem
+            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+              <AddItem
+                setList={setList}
+                setEdit={setEdit}
+                setSelected={setSelected}
+              />
+              <Button
+                variant={edit === true ? "contained" : "outlined"}
+                startIcon={<EditIcon />}
+                onClick={() => {
+                  setEdit(edit === false ? true : false);
+                  setSelected([]);
+                }}
+              >
+                EDIT
+              </Button>
+            </Stack>
+          </Grid>
+
+          <Grid
+            container
+            display="flex"
+            justifyContent="center"
+            alignItems="flex-start"
+            flexDirection="row"
+          >
+            <Category
+              selectedCategory={selectedCategory}
+              onClick={setSelectedCategory}
+              category={category}
+            />
+            <ListTable
+              list={list}
+              edit={edit}
+              category={selectedCategory}
+              selected={selected}
+              setSelected={setSelected}
               setList={setList}
               setEdit={setEdit}
-              setSelected={setSelected}
             />
-            <Button
-              variant={edit === true ? "contained" : "outlined"}
-              startIcon={<EditIcon />}
-              onClick={() => {
-                setEdit(edit === false ? true : false);
-                setSelected([]);
-              }}
-            >
-              EDIT
-            </Button>
-          </Stack>
-
-          <Category
-            selectedCategory={selectedCategory}
-            onClick={setSelectedCategory}
-            category={category}
-          />
-          <ListTable
-            list={list}
-            edit={edit}
-            category={selectedCategory}
-            selected={selected}
-            setSelected={setSelected}
-            setList={setList}
-            setEdit={setEdit}
-          />
-        </Grid>
+          </Grid>
+        </>
       )}
     </Grid>
   );

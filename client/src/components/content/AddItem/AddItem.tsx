@@ -7,6 +7,7 @@ import { ItemList } from "../ItemList/ItemList";
 import { dateDifference } from "../../../helpers/dateDifference";
 import InfoDialog from "./InfoDialog";
 import { FridgeContext } from "../../../contexts/FridgeContext.tsx";
+import { GridSelectionModel } from "@mui/x-data-grid";
 
 export interface Inputs {
   itemCategory: string;
@@ -29,7 +30,7 @@ export const defaultInputs: Inputs = {
 interface AddItemProps {
   setList: React.Dispatch<React.SetStateAction<ItemList[] | null>>;
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
-  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
+  setSelected: React.Dispatch<React.SetStateAction<GridSelectionModel>>;
 }
 
 function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
@@ -98,7 +99,7 @@ function AddItem({ setList, setEdit, setSelected }: AddItemProps) {
   return (
     <>
       <Button
-        variant="outlined"
+        variant={add === true ? "contained" : "outlined"}
         startIcon={<AddCircleIcon />}
         onClick={handleClickOpen}
       >
