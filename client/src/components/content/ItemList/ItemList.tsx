@@ -17,6 +17,11 @@ import Category, { CategoryType } from "./Category";
 import { Fridge } from "../ManageFridge/FridgeList";
 import { GridSelectionModel } from "@mui/x-data-grid";
 
+const fridgeType = {
+  Refrigerator: "Refrigerator",
+  Freezer: "Freezer",
+};
+
 export type ItemList = {
   id: number;
   quantity: number;
@@ -87,7 +92,7 @@ function ItemList(props: ItemListProps) {
         <Box
           sx={{
             m: 2,
-            mt: 10,
+            mt: 5,
             display: "flex",
             justifyContent: "center",
           }}
@@ -100,19 +105,28 @@ function ItemList(props: ItemListProps) {
           <Grid
             sx={{
               display: "flex",
-              flexDirection: "column",
-              width: "40%",
+              flexDirection: "rows",
+              mr: "2.5%",
               ml: "17.5%",
             }}
           >
-            <Typography variant="h5" sx={{ mt: 2 }}>
-              <AcUnitIcon /> {fridgeInfo.fridge_name}
-            </Typography>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-              {fridgeInfo.type} - {fridgeInfo.location}
-            </Typography>
+            <Grid sx={{ width: "40%", height: 100 }}>
+              <Typography variant="h5" sx={{ mt: 3 }}>
+                <AcUnitIcon /> {fridgeInfo.fridge_name}
+              </Typography>
+              <Typography variant="h6" sx={{ ml: 4, mb: 2 }}>
+                {fridgeInfo.type == "R"
+                  ? fridgeType.Refrigerator
+                  : fridgeType.Freezer}
+              </Typography>
+            </Grid>
 
-            <Stack direction="row" spacing={2} sx={{ mb: 2 }}>
+            <Stack
+              direction="row"
+              spacing={5}
+              justifyContent="flex-end"
+              sx={{ mt: 4, height: 45, width: "60%" }}
+            >
               <AddItem
                 setList={setList}
                 setEdit={setEdit}
