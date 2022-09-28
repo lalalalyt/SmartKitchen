@@ -67,7 +67,7 @@ const AddFridge = (props: AddFridgeProps) => {
     <>
       <Fab
         variant="extended"
-        sx={{ width: 250, ml: 3 }}
+        sx={{ width: 250, ml: "10vw", mt: "2vw" }}
         onClick={handleAddFridge}
       >
         <AddIcon sx={{ mr: 2 }} />
@@ -108,7 +108,9 @@ const AddFridge = (props: AddFridgeProps) => {
                 <TextField
                   id="name"
                   error={fridgeNameError}
-                  helperText={fridgeNameError? "Please enter an valid name!" : ""}
+                  helperText={
+                    fridgeNameError ? "Please enter an valid name!" : ""
+                  }
                   required
                   label="Fridge Name"
                   value={fridgeState.name}

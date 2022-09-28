@@ -5,13 +5,27 @@ import Authentication from "../topNav/Authentication";
 
 function TopNav() {
   const [, transite] = useContext(ModeContext);
+  const topNav = {
+    bgcolor: "background.paper",
+    color: "text.primary",
+    width: "100%",
+    height: "15vh",
+    boxShadow: 0,
+    alignContent: "center",
+    pl: "3vw",
+    pr: "3vw",
+  };
 
   return (
-    <AppBar position="static">
-      <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Button variant="text" sx={{ color: "white" }}>
-          <Typography variant="h3" onClick={() => transite("HOME")}>
-            SmartKitchen
+    <AppBar position="static" sx={topNav}>
+      <Toolbar sx={{ justifyContent: "space-between", mt: "4vh" }}>
+        <Button variant="text" sx={{ textTransform: "none" }}>
+          <Typography
+            variant="h3"
+            onClick={() => transite("HOME")}
+            sx={{ fontFamily: "sans-serif" }}
+          >
+            Smart Kitchen
           </Typography>
         </Button>
         <Authentication />

@@ -14,13 +14,12 @@ function Fridge(props: FridgeProps) {
       button
       onClick={props.onClick}
       sx={{
-        m: 3,
-        ml: 10,
-        bgcolor: "background.paper",
-        boxShadow: 1,
+        mb: 4,
+        bgcolor: "secondary.light",
+        boxShadow: 5,
         borderRadius: 2,
-        p: 2,
-        width: 530,
+        width: 500,
+        height: 80,
       }}
     >
       <ListItemText primary={props.name} secondary={fridgeType}></ListItemText>
