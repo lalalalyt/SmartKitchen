@@ -23,7 +23,7 @@ function TopNav() {
           <Typography
             variant="h3"
             onClick={() => transite("HOME")}
-            sx={{ fontFamily: "sans-serif" }}
+            sx={{ fontFamily: "Josefin Sans" }}
           >
             Smart Kitchen
           </Typography>

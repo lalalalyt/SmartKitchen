@@ -7,7 +7,7 @@ import { useContext, useState } from "react";
 import { dateDifference } from "../../../helpers/dateDifference";
 import { showDate } from "../../../helpers/showDate";
 import { showFresh } from "../../../helpers/showFresh";
-import { ItemList } from "./ItemList";
+import { fridgeListItem } from "./ItemList";
 import axios from "axios";
 
 import { defaultInputs, Inputs } from "../AddItem/AddItem";
@@ -15,17 +15,17 @@ import InfoDialog from "../AddItem/InfoDialog";
 import { FridgeContext } from "../../../contexts/FridgeContext.tsx";
 
 interface ListTableProps {
-  list: null | Array<ItemList>;
+  list: null | Array<fridgeListItem>;
   edit: boolean;
   category: null | number;
   selected: GridSelectionModel;
   setSelected: React.Dispatch<React.SetStateAction<GridSelectionModel>>;
-  setList: React.Dispatch<React.SetStateAction<ItemList[] | null>>;
+  setList: React.Dispatch<React.SetStateAction<fridgeListItem[] | null>>;
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 function ListTable(props: ListTableProps) {
-  const { list, edit, category, selected, setSelected, setList, setEdit } =
+  const { list, edit, category, selected, setSelected, setList } =
     props;
   const { fridgeID } = useContext(FridgeContext);
   const [change, setChange] = useState(false);
@@ -76,7 +76,7 @@ function ListTable(props: ListTableProps) {
     {
       field: "name",
       headerName: "Name",
-      width: 100,
+      flex: 1.2,
       headerAlign: "center",
       align: "center",
     },
@@ -84,21 +84,21 @@ function ListTable(props: ListTableProps) {
       field: "quantity",
       headerName: "Quantity",
       type: "number",
-      width: 100,
+      flex: 1,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "purchaseDate",
       headerName: "Purchase Date",
-      width: 180,
+      flex: 1.8,
       headerAlign: "center",
       align: "center",
     },
     {
       field: "bestBefore",
       headerName: "Best Before",
-      width: 180,
+      flex: 1.8,
       headerAlign: "center",
       align: "center",
     },
@@ -106,7 +106,7 @@ function ListTable(props: ListTableProps) {
       field: "remaining",
       headerName: "Remaining Days",
       sortable: true,
-      width: 100,
+      flex: 1.5,
       headerAlign: "center",
       align: "center",
     },
@@ -114,7 +114,7 @@ function ListTable(props: ListTableProps) {
       field: "fresh",
       headerName: "Fresh",
       sortable: true,
-      width: 140,
+      flex: 1.8,
       headerAlign: "center",
       align: "center",
     },
@@ -138,15 +138,55 @@ function ListTable(props: ListTableProps) {
         .sort((a, b) => a.fresh.length - b.fresh.length)
     : [];
 
+  const sxEditButton = {
+    m: 2,
+    textTransform: "capitalize",
+    fontFamily: "Josefin Sans",
+    fontSize: 18,
+    fontWeight: "bold",
+  };
+
   return (
-    <Grid container sx={{ width: "80%" }}>
+    <Grid
+      container
+      sx={{
+        width: "80%",
+        justifyContent: "center",
+        flexDirection: "row",
+        alignItems: "center",
+        height: "100%",
+      }}
+    >
       {list?.length === 0 && (
-        <Typography>Your fridge is empty! Start to add items now!</Typography>
+        <Typography
+          sx={{
+            color: "primary.dark",
+            fontFamily: "Josefin Sans",
+            fontSize: 25,
+            fontWeight: "bold",
+          }}
+        >
+          Your fridge is empty! Start to add items now!
+        </Typography>
       )}
       {list && list.length !== 0 && (
         <>
           <div style={{ height: 400, width: "100%" }}>
             <DataGrid
+              sx={{
+                boxShadow: 5,
+                border: 0,
+                borderColor: "primary.light",
+                "& .MuiDataGrid-cell:hover": {
+                  color: "primary.main",
+                },
+                "& .MuiDataGrid-columnHeaderTitle": {
+                  // fontWeight: "bold",
+                  fontSize: 14,
+                },
+                color: "black",
+                bgcolor: "secondary.light",
+              }}
               rows={rows}
               columns={columns}
               pageSize={5}
@@ -161,12 +201,16 @@ function ListTable(props: ListTableProps) {
 
           {edit === true && selected.length !== 0 && (
             <Grid
-              sx={{ width: "100%", display: "flex", justifyContent: "center" }}
+              sx={{
+                width: "100%",
+                display: "flex",
+                justifyContent: "space-evenly",
+              }}
             >
               <Button
                 onClick={handleDelete}
-                sx={{ m: 2 }}
-                variant={"outlined"}
+                sx={sxEditButton}
+                variant={"text"}
                 startIcon={<DeleteIcon />}
               >
                 Delete from fridge
@@ -180,8 +224,8 @@ function ListTable(props: ListTableProps) {
               </Button>*/}
               <Button
                 onClick={handleChange}
-                sx={{ m: 2 }}
-                variant={"outlined"}
+                sx={sxEditButton}
+                variant={"text"}
                 startIcon={<EditIcon />}
               >
                 Change the info of item

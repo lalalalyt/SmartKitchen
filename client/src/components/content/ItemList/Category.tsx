@@ -12,12 +12,18 @@ interface CategoryProps {
 }
 
 function Category(props: CategoryProps) {
+  const sxButton = {
+    m: 1.2,
+    width: 100,
+    textTransform: "capitalize",
+    fontFamily: "Josefin Sans",
+    fontSize: 16,
+    fontWeight: "bold",
+  };
   const categoryButton = props.category?.map((eachType) => (
     <Button
-      variant={
-        eachType.id === props.selectedCategory ? "contained" : "outlined"
-      }
-      sx={{ m: 1.2, width: 100 }}
+      variant={eachType.id === props.selectedCategory ? "contained" : "text"}
+      sx={sxButton}
       key={eachType.id}
       onClick={() => props.onClick(eachType.id)}
     >
@@ -29,18 +35,18 @@ function Category(props: CategoryProps) {
       sx={{
         display: "flex",
         flexDirection: "column",
-        width: "15%",
-        mt: "5%",
+        width: "12%",
+        mt: "2%",
       }}
     >
       {categoryButton}
       <Button
-        variant={props.selectedCategory ? "outlined" : "contained"}
-        sx={{ m: 1.2, width: 100 }}
+        variant={props.selectedCategory ? "text" : "contained"}
+        sx={sxButton}
         key={-1}
         onClick={() => props.onClick(null)}
       >
-        ALL
+        all
       </Button>
     </Grid>
   );

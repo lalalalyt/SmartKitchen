@@ -18,7 +18,12 @@ const theme = createTheme({
     },
   },
   typography: {
-    fontFamily: ["Arial", "sans-serif"].join(","),
+    fontFamily: [
+      "Arial",
+      "sans-serif",
+      "'Josefin Sans'",
+      "'Dancing Script'",
+    ].join(","),
   },
 });
 

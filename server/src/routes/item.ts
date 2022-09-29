@@ -46,8 +46,9 @@ itemRouter.get("/:fridge_type/search/:item_name", (req, res) => {
 
 itemRouter.post("/:fridge_type/search/:item_name", (req, res) => {
   client
-    .query(`SELECT id FROM "item" WHERE name=$1`, [
+    .query(`SELECT id FROM "item" WHERE name=$1 and place=$2`, [
       req.body.name.toLowerCase().trim(),
+      req.body.place,
     ])
     .then((result) => {
       if (result.rows.length != 0) return res.status(400).end();

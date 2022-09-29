@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import AddItem from "../AddItem/AddItem";
 import ListTable from "./ListTable";
 import Category, { CategoryType } from "./Category";
-import { Fridge } from "../ManageFridge/FridgeList";
+import { fridgeInfo } from "../ManageFridge/FridgeList";
 import { GridSelectionModel } from "@mui/x-data-grid";
 
 const fridgeType = {
@@ -22,7 +22,7 @@ const fridgeType = {
   Freezer: "Freezer",
 };
 
-export type ItemList = {
+export type fridgeListItem = {
   id: number;
   quantity: number;
   purchasedate: string;
@@ -53,7 +53,7 @@ function ItemList(props: ItemListProps) {
   const [edit, setEdit] = useState<boolean>(false);
   const [selected, setSelected] = useState<GridSelectionModel>([]);
   const [selectedCategory, setSelectedCategory] = useState<null | number>(null);
-  const [list, setList] = useState<null | Array<ItemList>>(null);
+  const [list, setList] = useState<null | Array<fridgeListItem>>(null);
   const [category, setCategory] = useState<null | Array<CategoryType>>(null);
   const [fridgeInfo, setFridgeInfo] = useState<FridgeInfo>({
     fridge_id: 0,
@@ -70,7 +70,7 @@ function ItemList(props: ItemListProps) {
     ]).then((res) => {
       res[0].data.length === 0 ? setList([]) : setList(res[0].data);
       const selectedFridge = res[1].data.filter(
-        (fridge: Fridge) => fridge.id === props.fridgeID
+        (fridge: fridgeInfo) => fridge.id === props.fridgeID
       );
       setFridgeInfo({
         fridge_id: selectedFridge[0].id,
@@ -80,19 +80,14 @@ function ItemList(props: ItemListProps) {
       });
       setCategory(res[2].data);
     });
-  }, []);
+  }, [props.fridgeID]);
   return (
-    <Grid
-      container
-      display="flex"
-      flexDirection="column"
-      justifyContent="center"
-    >
+    <>
       {!category && (
         <Box
           sx={{
-            m: 2,
-            mt: 5,
+            width: "100%",
+            mt: "20vh",
             display: "flex",
             justifyContent: "center",
           }}
@@ -101,21 +96,40 @@ function ItemList(props: ItemListProps) {
         </Box>
       )}
       {category && (
-        <>
+        <Grid container flexDirection="column">
           <Grid
             sx={{
               display: "flex",
               flexDirection: "rows",
-              mr: "2.5%",
-              ml: "17.5%",
+              mr: "4%",
+              ml: "16%",
             }}
           >
             <Grid sx={{ width: "40%", height: 100 }}>
-              <Typography variant="h5" sx={{ mt: 3 }}>
+              <Typography
+                variant="h5"
+                sx={{
+                  mt: 2,
+                  color: "primary.dark",
+                  fontFamily: "Dancing Script",
+                  fontSize: 32,
+                  fontWeight: "bold",
+                }}
+              >
                 <AcUnitIcon /> {fridgeInfo.fridge_name}
               </Typography>
-              <Typography variant="h6" sx={{ ml: 4, mb: 2 }}>
-                {fridgeInfo.type == "R"
+              <Typography
+                variant="h6"
+                sx={{
+                  ml: 4,
+                  mb: 2,
+                  color: "primary.dark",
+                  fontFamily: "Josefin Sans",
+                  fontSize: 22,
+                  fontWeight: "bold",
+                }}
+              >
+                {fridgeInfo.type === "R"
                   ? fridgeType.Refrigerator
                   : fridgeType.Freezer}
               </Typography>
@@ -133,14 +147,21 @@ function ItemList(props: ItemListProps) {
                 setSelected={setSelected}
               />
               <Button
-                variant={edit === true ? "contained" : "outlined"}
+                variant={edit === true ? "contained" : "text"}
+                sx={{
+                  textTransform: "capitalize",
+                  fontFamily: "sans-serif",
+                  fontSize: 16,
+                  fontWeight: "bold",
+                  width: "80px",
+                }}
                 startIcon={<EditIcon />}
                 onClick={() => {
                   setEdit(edit === false ? true : false);
                   setSelected([]);
                 }}
               >
-                EDIT
+                edit
               </Button>
             </Stack>
           </Grid>
@@ -167,9 +188,9 @@ function ItemList(props: ItemListProps) {
               setEdit={setEdit}
             />
           </Grid>
-        </>
+        </Grid>
       )}
-    </Grid>
+    </>
   );
 }
 

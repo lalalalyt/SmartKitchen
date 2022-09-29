@@ -27,7 +27,7 @@ export interface DBUser {
 }
 
 function Authentication() {
-  const [mode, transite] = useContext(ModeContext);
+  const [, transite] = useContext(ModeContext);
   const { user, setUser } = useContext(UserContext);
   const [open, setOpen] = useState(false);
   const [toastLogin, setToastLogin] = useState(false);
@@ -183,7 +183,7 @@ function Authentication() {
       <Button
         color="inherit"
         onClick={handleClickOpen}
-        sx={{ textTransform: "none", fontSize: 25 }}
+        sx={{ textTransform: "none", fontSize: 25, fontFamily: "Josefin Sans" }}
       >
         {user.name ? user.name : "Login"}
       </Button>
@@ -360,6 +360,7 @@ function Authentication() {
           onClose={() => {
             setOpen(false);
           }}
+          PaperProps={{ sx: { width: "32%" } }}
         >
           <DialogTitle sx={{ display: "flex", justifyContent: "center" }}>
             Hi {user.name}

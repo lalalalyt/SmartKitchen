@@ -14,7 +14,7 @@ function Fridge(props: FridgeProps) {
       button
       onClick={props.onClick}
       sx={{
-        mb: 4,
+        mt: 4,
         bgcolor: "secondary.light",
         boxShadow: 5,
         borderRadius: 2,
